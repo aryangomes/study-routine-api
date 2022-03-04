@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Api\v1\Auth;
 
+use App\Actions\Auth\CreateTokenToUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Resources\Auth\UserLoggedResource;
 use App\Services\Auth\RegisterUserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class RegisterUserController extends Controller
 {
-    public function __construct(private RegisterUserService $registerUserService)
-    {
+    public function __construct(
+        private RegisterUserService $registerUserService,
+        private CreateTokenToUser $createTokenToUser
+    ) {
     }
 
     /**
@@ -26,10 +30,8 @@ class RegisterUserController extends Controller
 
         $userRegistered = $this->registerUserService->execute($validatedData);
 
-        if (!is_null($userRegistered)) {
-            return response(['user' => $userRegistered], Response::HTTP_CREATED);
-        }
+        $this->createTokenToUser->execute($userRegistered);
 
-        return response('error', Response::HTTP_BAD_REQUEST);
+        return response()->json(new UserLoggedResource($userRegistered), Response::HTTP_CREATED);
     }
 }
