@@ -8,7 +8,6 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\Auth\UserLoggedResource;
 use App\Services\Auth\LoginService;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -31,8 +30,9 @@ class LoginController extends Controller
 
         $userLogged = $this->loginService->execute($requestValidated);
 
-        $this->createTokenToUser->execute($userLogged);
-
-        return response()->json(new UserLoggedResource($userLogged), Response::HTTP_OK);
+        return response()->json(
+            new UserLoggedResource($userLogged),
+            Response::HTTP_OK
+        );
     }
 }
