@@ -25,6 +25,6 @@ class LogoutController extends Controller
 
         $this->logoutUser->execute($userLogged);
 
-        return response('Logout successfully!');
+        return response()->json(__('auth.logout.success'));
     }
 }

@@ -6,6 +6,7 @@ use App\Actions\Auth\CreateTokenToUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\Auth\UserLoggedResource;
+use App\Services\Auth\LoginService;
 use App\Services\Auth\RegisterUserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,7 +15,8 @@ class RegisterUserController extends Controller
 {
     public function __construct(
         private RegisterUserService $registerUserService,
-        private CreateTokenToUser $createTokenToUser
+        private CreateTokenToUser $createTokenToUser,
+        private LoginService $loginService,
     ) {
     }
 
@@ -28,10 +30,20 @@ class RegisterUserController extends Controller
     {
         $validatedData = $request->validated();
 
-        $userRegistered = $this->registerUserService->execute($validatedData);
+        $this->registerUserService->execute($validatedData);
 
-        $this->createTokenToUser->execute($userRegistered);
+        $userLogged = $this->loginRegisteredUser($validatedData);
 
-        return response()->json(new UserLoggedResource($userRegistered), Response::HTTP_CREATED);
+        return response()->json(new UserLoggedResource($userLogged), Response::HTTP_CREATED);
+    }
+
+    private function loginRegisteredUser(array $registeredUserData)
+    {
+        $dataToLoginRegisteredUser = [
+            'email' => $registeredUserData['email'],
+            'password' => $registeredUserData['password'],
+        ];
+
+        return $this->loginService->execute($dataToLoginRegisteredUser);
     }
 }

@@ -13,8 +13,8 @@ class LoginController extends Controller
 {
 
     public function __construct(
-        private LoginService $loginService,
-        private CreateTokenToUser $createTokenToUser
+        private LoginService $loginService
+
     ) {
     }
 
