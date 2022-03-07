@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Auth;
+namespace App\Http\Resources\User;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserLoggedResource extends JsonResource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,8 +20,6 @@ class UserLoggedResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'user_avatar_path' => $this->user_avatar_path,
-            'accessToken' => $this->currentAccessToken(),
-
         ];
     }
 }

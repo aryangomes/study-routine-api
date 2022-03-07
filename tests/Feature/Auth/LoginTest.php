@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +34,7 @@ class LoginTest extends TestCase
     {
 
         $response = $this->postJson(
-            '/login',
+            route('auth.login'),
             $this->credentialsToLogin
         );
 
@@ -45,11 +45,11 @@ class LoginTest extends TestCase
      * @test
      * @dataProvider invalidCredentials
      */
-    public function login_user_it_fails_with_invalid_credentials($invalidCredentials)
+    public function login_user_should_fail_because_credentials_are_not_valid($invalidCredentials)
     {
 
         $response = $this->postJson(
-            '/login',
+            route('auth.login'),
             $invalidCredentials
         );
 
@@ -65,13 +65,13 @@ class LoginTest extends TestCase
         ];
 
         return [
-            'Email not exists' =>
+            'Email is not exists' =>
             [
                 collect($defaultCredentials)->replace(['email' => 'another@email.com'])->toArray()
 
             ],
 
-            'Password incorrect' =>
+            'Password is incorrect' =>
             [
                 collect($defaultCredentials)->replace(['password' => 'another_password'])->toArray()
 

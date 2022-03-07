@@ -4,14 +4,24 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RegisterUserTest extends TestCase
 {
-    use  RefreshDatabase;
+    use  RefreshDatabase, WithFaker;
 
-    private $uniqueEmail = "unique@email.com";
-    private $uniqueUsername = "uniqueUsername";
+    private string $uniqueEmail = "unique@email.com";
+    private string $uniqueUsername = "uniqueUsername";
+
+    private array $defaultData =
+    [
+        'name' => 'name',
+        'username' => 'username',
+        'email' => 'email@email.com',
+        'password' => 'password',
+        'password_confirmation' =>  'password',
+    ];
 
     /**
      *      
@@ -20,6 +30,7 @@ class RegisterUserTest extends TestCase
     public function register_user_successfully()
     {
         $userDataToRegister = User::factory()->make()->toArray();
+
         $userDataToRegister = [
             ...$userDataToRegister,
             ...[
@@ -27,16 +38,43 @@ class RegisterUserTest extends TestCase
                 'password_confirmation' => 'password',
             ]
         ];
-        $response = $this->postJson('/register', $userDataToRegister);
+        $response = $this->postJson(route('auth.register'), $userDataToRegister);
 
         $response->assertStatus(201);
+
+        $this->assertEquals($userDataToRegister['email'], User::find($response->getData()->id)->email);
     }
 
     /**
      * @test
      * @dataProvider invalidDataToRegisterAUser
      */
-    public function user_register_it_fails_with_invalid_data($invalidDataToRegisterAUser)
+    public function user_register_should_fail_because_data_is_not_valid($invalidDataToRegisterAUser)
+    {
+        $userDataToRegister = User::factory()->make(
+            [
+                'email' => $this->uniqueEmail,
+                'username' => $this->uniqueUsername,
+            ]
+        );
+        $response = $this->postJson(
+            route('auth.register'),
+            $invalidDataToRegisterAUser
+        );
+
+        $response->assertUnprocessable();
+
+        $this->assertNull(User::where(
+            'email',
+            $userDataToRegister['email']
+        )->first());
+    }
+
+    /**
+     * @test
+     * @dataProvider duplicateDataToRegister
+     */
+    public function user_register_should_fail_because_user_already_exists($duplicateDataToRegister)
     {
         $userDataToRegister = User::factory()->create(
             [
@@ -44,63 +82,69 @@ class RegisterUserTest extends TestCase
                 'username' => $this->uniqueUsername,
             ]
         );
-        $response = $this->postJson('/register', $invalidDataToRegisterAUser);
+        $response = $this->postJson(
+            route('auth.register'),
+            $duplicateDataToRegister
+        );
 
         $response->assertUnprocessable();
     }
 
     public function invalidDataToRegisterAUser(): array
     {
-        $defaultData =
-            [
-                'name' => 'name',
-                'username' => 'username',
-                'email' => 'email@email.com',
-                'password' => 'password',
-                'password_confirmation' =>  'password',
-            ];
-
-        $notString = 12345;
-
-        $invalidEmail = 'invalid.email';
 
         return [
 
-            'Name required' => [
-                collect($defaultData)->forget('name')->toArray()
+            'Name is required' => [
+                collect($this->defaultData)->forget('name')->toArray()
             ],
-            'Name not string' => [
-                collect($defaultData)->replace(['name' => $notString])->toArray()
+            'Name is not string' => [
+                collect($this->defaultData)->replace(
+                    ['name' => $this->faker(User::class)->randomDigit()]
+                )->toArray()
             ],
-            'Username required' => [
-                collect($defaultData)->forget('username')->toArray()
-            ], 'Username not string' => [
-                collect($defaultData)->replace(['username' => $notString])->toArray()
-            ],  'Username unique' => [
-                collect($defaultData)->replace(['username' => $this->uniqueUsername])->toArray()
-            ], 'Email invalid' => [
-                collect($defaultData)->replace(['email' => $invalidEmail])->toArray()
-            ], 'Email required' => [
-                collect($defaultData)->forget('email')->toArray()
-            ], 'Email unique' => [
-                collect($defaultData)->replace(['email' => $this->uniqueEmail])->toArray()
+            'Username is required' => [
+                collect($this->defaultData)->forget('username')->toArray()
+            ], 'Username is not string' => [
+                collect($this->defaultData)->replace(['username' => $this->faker(User::class)->randomDigit()])->toArray()
+            ],   'Email is a invalid email' => [
+                collect($this->defaultData)->replace(['email' => $this->faker(User::class)->title()])->toArray()
+            ], 'Email is required' => [
+                collect($this->defaultData)->forget('email')->toArray()
             ],
 
-            'Password required' => [
-                collect($defaultData)->forget('password')->toArray()
-            ], 'Password string' => [
-                collect($defaultData)->replace(['password' => $notString])->toArray()
+            'Password is required' => [
+                collect($this->defaultData)->forget('password')->toArray()
+            ], 'Password is not string' => [
+                collect($this->defaultData)->replace(['password' => $this->faker(User::class)->randomDigit()])->toArray()
             ],
 
-            'Password confirmed' => [
-                collect($defaultData)->replace(['password_confirmation' => $notString])->toArray()
+            'Password does not matched' => [
+                collect($this->defaultData)->replace([
+                    'password' => $this->faker(User::class)->title(),
+                    'password_confirmation' => $this->faker(User::class)->text()
+                ])->toArray()
             ],
 
-            'Password Confirmation required' => [
-                collect($defaultData)->forget('password_confirmation')->toArray()
-            ], 'Password Confirmation string' => [
-                collect($defaultData)->replace(['password_confirmation' => $notString])->toArray()
+            'Password Confirmation is required' => [
+                collect($this->defaultData)->forget('password_confirmation')->toArray()
+            ], 'Password Confirmation is not string' => [
+                collect($this->defaultData)->replace(['password_confirmation' => $this->faker(User::class)->randomDigit()])->toArray()
             ],
+
+        ];
+    }
+
+    public function duplicateDataToRegister()
+    {
+        return [
+
+            'Username is not unique' => [
+                collect($this->defaultData)->replace(['username' => $this->uniqueUsername])->toArray()
+            ], 'Email is not unique' => [
+                collect($this->defaultData)->replace(['email' => $this->uniqueEmail])->toArray()
+            ],
+
 
         ];
     }
