@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Api\v1\Auth;
 
+use App\Actions\Auth\CreateTokenToUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Auth\UserLoggedResource;
 use App\Services\Auth\LoginService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
 
-    public function __construct(private LoginService $loginService)
-    {
+    public function __construct(
+        private LoginService $loginService,
+        private CreateTokenToUser $createTokenToUser
+    ) {
     }
 
     /**
@@ -25,13 +29,10 @@ class LoginController extends Controller
     {
         $requestValidated = $request->validated();
 
-        $userLogin = $this->loginService->execute($requestValidated);
+        $userLogged = $this->loginService->execute($requestValidated);
 
-        $userWasLoginSuccessfully = (!is_null($userLogin));
+        $this->createTokenToUser->execute($userLogged);
 
-        if (!$userWasLoginSuccessfully) {
-            return response('error', Response::HTTP_BAD_REQUEST);
-        }
-        return response(['user' => $userLogin], Response::HTTP_OK);
+        return response()->json(new UserLoggedResource($userLogged), Response::HTTP_OK);
     }
 }
