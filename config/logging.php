@@ -121,7 +121,7 @@ return [
             'handler' => Monolog\Handler\BrowserConsoleHandler::class,
             'formatter' => Monolog\Formatter\HtmlFormatter::class,
             'formatter_with' => [
-                'dateFormat' => 'Y-m-d',
+                'dateFormat' => 'Y-m-d H:i:s',
             ],
         ],
     ],
