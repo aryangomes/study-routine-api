@@ -4,6 +4,7 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\Crud\RegisterRecordFailException;
 
 class RegisterUser
 {
@@ -20,7 +21,7 @@ class RegisterUser
             $registeredUser = User::create($userData);
 
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (RegisterRecordFailException $exception) {
             info($exception->getMessage());
             DB::rollBack();
         }
