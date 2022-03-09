@@ -19,6 +19,7 @@ class UserLoggedResource extends JsonResource
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
+            'user_avatar_path' => $this->user_avatar_path,
             'accessToken' => $this->currentAccessToken(),
 
         ];
