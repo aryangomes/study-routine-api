@@ -2,11 +2,20 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
+
+    private User $user;
+
+    public function __construct()
+    {
+        $this->user = auth()->user();
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,12 +38,12 @@ class UpdateUserRequest extends FormRequest
             'username' => [
                 'sometimes',
                 'string',
-                Rule::unique('users')->ignore($this->user->id),
+                Rule::unique('users')->ignore($this?->user->id),
             ],
             'email' => [
                 'sometimes',
                 'email',
-                Rule::unique('users')->ignore($this->user->id)
+                Rule::unique('users')->ignore($this?->user->id)
             ],
             'password' => ['sometimes', 'string', 'confirmed'],
             'password_confirmation' => ['string', 'required_with:password'],
