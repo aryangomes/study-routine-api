@@ -18,7 +18,7 @@ class LogoutUser
 
             $userLogged->tokens()->where('id', $tokenId)->delete();
         } catch (\Exception $exception) {
-            info($exception->getMessage());
+            logger($exception->getMessage());
         }
     }
 }

@@ -22,7 +22,7 @@ class RegisterUser
 
             DB::commit();
         } catch (RegisterRecordFailException $exception) {
-            info($exception->getMessage());
+            logger($exception->getMessage());
             DB::rollBack();
         }
 
