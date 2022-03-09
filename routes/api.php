@@ -34,5 +34,11 @@ Route::middleware('auth:sanctum')->get('/logout', LogoutController::class)->name
  * Sanctum Middleware Routes
  */
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('users', UserController::class);
+
+    Route::controller(UserController::class)
+        ->name('users.')
+        ->group(function () {
+            Route::patch('/users', 'update')->name('update');
+            Route::delete('/users', 'destroy')->name('destroy');
+        });
 });

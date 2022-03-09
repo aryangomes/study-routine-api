@@ -29,7 +29,7 @@ class UserControllerTest extends TestCase
      * @test
      * @dataProvider validatedDataToUpdateUser
      */
-    public function updated_user_successfully(array $validatedDataToUpdateUser, string $key)
+    public function update_user_successfully(array $validatedDataToUpdateUser, string $key)
     {
         Sanctum::actingAs($this->user);
 
@@ -52,7 +52,7 @@ class UserControllerTest extends TestCase
      * @test
      * @dataProvider invalidatedDataToUpdateUser
      */
-    public function updated_user_should_fails_because_data_is_invalidated(array $invalidatedDataToUpdateUser, string $key)
+    public function update_user_should_fail_because_data_is_not_valid(array $invalidatedDataToUpdateUser, string $key)
     {
         User::factory()->create(
             [
@@ -64,11 +64,7 @@ class UserControllerTest extends TestCase
         Sanctum::actingAs($this->user);
 
         $response = $this->patchJson(
-            route(
-                'users.update',
-                ['user' => $this->user],
-
-            ),
+            route('users.update'),
             $invalidatedDataToUpdateUser
         );
 
@@ -76,6 +72,41 @@ class UserControllerTest extends TestCase
 
         $this->assertNotEquals($invalidatedDataToUpdateUser[$key], $this->user->$key);
     }
+
+    /**
+     * @test
+     */
+    public function delete_user_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->deleteJson(
+            route(
+                'users.destroy'
+            )
+        );
+        $response->assertNoContent();
+
+        $this->assertDeleted('users', $this->user->toArray());
+    }
+
+    /**
+     * @test
+     */
+    public function delete_user_should_fail_because_user_is_unauthenticated()
+    {
+
+        $response = $this->deleteJson(
+            route(
+                'users.destroy'
+            )
+        );
+        $response->assertUnauthorized();
+
+        $this->assertTrue((User::find($this->user->id)) !== null);
+    }
+
+
 
     public function validatedDataToUpdateUser(): array
     {

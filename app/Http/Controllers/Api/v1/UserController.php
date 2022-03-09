@@ -7,6 +7,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Services\User\UserService;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -41,29 +42,36 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\User\UpdateUserRequest  $request
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request)
     {
 
         $validatedData = $request->validated();
 
-        $this->userService = new UserService($user);
+        $userLogged = auth()->user();
+
+        $this->userService = new UserService($userLogged);
 
         $this->userService->updateUser($validatedData);
 
-        return response()->json(new UserResource($user));
+        return response()->json(new UserResource($userLogged));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy()
     {
-        //
+
+        $userLogged = auth()->user();
+
+        $this->userService = new UserService($userLogged);
+
+        $this->userService->deleteUser();
+
+        return response(status: Response::HTTP_NO_CONTENT);
     }
 }
