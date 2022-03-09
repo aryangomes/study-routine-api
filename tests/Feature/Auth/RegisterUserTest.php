@@ -4,11 +4,12 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RegisterUserTest extends TestCase
 {
-    use  RefreshDatabase;
+    use  RefreshDatabase, WithFaker;
 
     private string $uniqueEmail = "unique@email.com";
     private string $uniqueUsername = "uniqueUsername";
@@ -37,7 +38,7 @@ class RegisterUserTest extends TestCase
                 'password_confirmation' => 'password',
             ]
         ];
-        $response = $this->postJson('/register', $userDataToRegister);
+        $response = $this->postJson(route('auth.register'), $userDataToRegister);
 
         $response->assertStatus(201);
 
@@ -56,11 +57,22 @@ class RegisterUserTest extends TestCase
                 'username' => $this->uniqueUsername,
             ]
         );
-        $response = $this->postJson('/register', $invalidDataToRegisterAUser);
-
+        $response = $this->postJson(
+            route('auth.register'),
+            $invalidDataToRegisterAUser
+        );
+        logger(
+            get_class($this),
+            [
+                '$response->getData()' => $response->getData(),
+            ]
+        );
         $response->assertUnprocessable();
 
-        $this->assertNull(User::where('email', $userDataToRegister['email'])->first());
+        $this->assertNull(User::where(
+            'email',
+            $userDataToRegister['email']
+        )->first());
     }
 
     /**
@@ -75,7 +87,10 @@ class RegisterUserTest extends TestCase
                 'username' => $this->uniqueUsername,
             ]
         );
-        $response = $this->postJson('/register', $duplicateDataToRegister);
+        $response = $this->postJson(
+            route('auth.register'),
+            $duplicateDataToRegister
+        );
 
         $response->assertUnprocessable();
     }
@@ -83,43 +98,43 @@ class RegisterUserTest extends TestCase
     public function invalidDataToRegisterAUser(): array
     {
 
-
-        $notString = 12345;
-
-        $invalidEmail = 'invalid.email';
-
         return [
 
-            'Name required' => [
+            'Name is required' => [
                 collect($this->defaultData)->forget('name')->toArray()
             ],
-            'Name not string' => [
-                collect($this->defaultData)->replace(['name' => $notString])->toArray()
+            'Name is not string' => [
+                collect($this->defaultData)->replace(
+                    ['name' => $this->faker(User::class)->randomDigit()]
+                )->toArray()
             ],
-            'Username required' => [
+            'Username is required' => [
                 collect($this->defaultData)->forget('username')->toArray()
-            ], 'Username not string' => [
-                collect($this->defaultData)->replace(['username' => $notString])->toArray()
-            ],   'Email invalid' => [
-                collect($this->defaultData)->replace(['email' => $invalidEmail])->toArray()
-            ], 'Email required' => [
+            ], 'Username is not string' => [
+                collect($this->defaultData)->replace(['username' => $this->faker(User::class)->randomDigit()])->toArray()
+            ],   'Email is a invalid email' => [
+                collect($this->defaultData)->replace(['email' => $this->faker(User::class)->title()])->toArray()
+            ], 'Email is required' => [
                 collect($this->defaultData)->forget('email')->toArray()
             ],
 
-            'Password required' => [
+            'Password is required' => [
                 collect($this->defaultData)->forget('password')->toArray()
-            ], 'Password string' => [
-                collect($this->defaultData)->replace(['password' => $notString])->toArray()
+            ], 'Password is not string' => [
+                collect($this->defaultData)->replace(['password' => $this->faker(User::class)->randomDigit()])->toArray()
             ],
 
-            'Password confirmed' => [
-                collect($this->defaultData)->replace(['password_confirmation' => $notString])->toArray()
+            'Password does not matched' => [
+                collect($this->defaultData)->replace([
+                    'password' => $this->faker(User::class)->title(),
+                    'password_confirmation' => $this->faker(User::class)->text()
+                ])->toArray()
             ],
 
-            'Password Confirmation required' => [
+            'Password Confirmation is required' => [
                 collect($this->defaultData)->forget('password_confirmation')->toArray()
-            ], 'Password Confirmation string' => [
-                collect($this->defaultData)->replace(['password_confirmation' => $notString])->toArray()
+            ], 'Password Confirmation is not string' => [
+                collect($this->defaultData)->replace(['password_confirmation' => $this->faker(User::class)->randomDigit()])->toArray()
             ],
 
         ];
@@ -129,9 +144,9 @@ class RegisterUserTest extends TestCase
     {
         return [
 
-            'Username unique' => [
+            'Username is not unique' => [
                 collect($this->defaultData)->replace(['username' => $this->uniqueUsername])->toArray()
-            ], 'Email unique' => [
+            ], 'Email is not unique' => [
                 collect($this->defaultData)->replace(['email' => $this->uniqueEmail])->toArray()
             ],
 

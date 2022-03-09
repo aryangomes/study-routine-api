@@ -29,7 +29,7 @@ class LogoutTest extends TestCase
     {
         Sanctum::actingAs($this->userToLogout);
 
-        $response = $this->getJson('/logout');
+        $response = $this->getJson(route('auth.logout'));
 
         $response->assertOk();
     }
@@ -41,7 +41,7 @@ class LogoutTest extends TestCase
     public function logout_should_fail_because_user_is_not_authenticated()
     {
 
-        $response = $this->getJson('/logout');
+        $response = $this->getJson(route('auth.logout'));
 
         $response->assertUnauthorized();
     }
