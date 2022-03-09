@@ -45,7 +45,7 @@ class LoginTest extends TestCase
      * @test
      * @dataProvider invalidCredentials
      */
-    public function login_user_it_fails_with_invalid_credentials($invalidCredentials)
+    public function login_user_should_fail_because_credentials_are_not_valid($invalidCredentials)
     {
 
         $response = $this->postJson(

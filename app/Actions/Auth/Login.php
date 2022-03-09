@@ -28,12 +28,12 @@ class Login
         if (!$user || !Hash::check($dataToLogin['password'], $user->password)) {
             if (!$user) {
                 throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
+                    'email' => [__('auth.failed')],
 
                 ])->status(Response::HTTP_UNPROCESSABLE_ENTITY);
             } else {
                 throw ValidationException::withMessages([
-                    'password' => ['The provided credentials are incorrect.'],
+                    'password' => [__('auth.password')],
 
                 ])->status(Response::HTTP_UNPROCESSABLE_ENTITY);
             }

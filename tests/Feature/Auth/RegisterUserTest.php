@@ -49,7 +49,7 @@ class RegisterUserTest extends TestCase
      * @test
      * @dataProvider invalidDataToRegisterAUser
      */
-    public function user_register_it_fails_with_invalid_data($invalidDataToRegisterAUser)
+    public function user_register_should_fail_because_data_is_not_valid($invalidDataToRegisterAUser)
     {
         $userDataToRegister = User::factory()->make(
             [
@@ -61,12 +61,7 @@ class RegisterUserTest extends TestCase
             route('auth.register'),
             $invalidDataToRegisterAUser
         );
-        logger(
-            get_class($this),
-            [
-                '$response->getData()' => $response->getData(),
-            ]
-        );
+
         $response->assertUnprocessable();
 
         $this->assertNull(User::where(
@@ -79,7 +74,7 @@ class RegisterUserTest extends TestCase
      * @test
      * @dataProvider duplicateDataToRegister
      */
-    public function user_register_it_fails_because_user_already_exists($duplicateDataToRegister)
+    public function user_register_should_fail_because_user_already_exists($duplicateDataToRegister)
     {
         $userDataToRegister = User::factory()->create(
             [
