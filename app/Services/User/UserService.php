@@ -27,7 +27,9 @@ class UserService
      */
     public function updateUser($dataToUpdateUser)
     {
-        $this->updateUserAction->execute($dataToUpdateUser);
+        $updateUserAction = $this->updateUserAction;
+
+        $updateUserAction($dataToUpdateUser);
 
         return $this->user;
     }
