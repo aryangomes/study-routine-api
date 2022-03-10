@@ -44,6 +44,8 @@ class RegisterUserController extends Controller
             'password' => $registeredUserData['password'],
         ];
 
-        return $this->loginService->execute($dataToLoginRegisteredUser);
+        $loginService = $this->loginService;
+
+        return  $loginService($dataToLoginRegisteredUser);
     }
 }

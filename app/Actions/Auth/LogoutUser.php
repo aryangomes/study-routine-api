@@ -3,6 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class LogoutUser
 {
@@ -11,14 +12,17 @@ class LogoutUser
     }
 
 
-    public function execute(User $userLogged)
+    public function __invoke(User $userLogged)
     {
         try {
+            DB::beginTransaction();
             $tokenId = $userLogged->currentAccessToken()->id;
 
-            $userLogged->tokens()->where('id', $tokenId)->delete();
+            $currentAccessTokenWasDelete = $userLogged->tokens()->where('id', $tokenId)->delete();
         } catch (\Exception $exception) {
             logger($exception->getMessage());
         }
+
+        $currentAccessTokenWasDelete ? DB::commit() : DB::rollBack();
     }
 }

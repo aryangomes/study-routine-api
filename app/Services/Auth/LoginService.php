@@ -16,7 +16,7 @@ class LoginService
     ) {
     }
 
-    public function execute(array $dataToLogin)
+    public function __invoke(array $dataToLogin)
     {
         $userLogged = $this->login->execute($dataToLogin);
 
