@@ -11,7 +11,7 @@ class UpdateUser
     {
     }
 
-    public function execute(array $dataToUpdateUser): void
+    public function __invoke(array $dataToUpdateUser): void
     {
         try {
             DB::beginTransaction();
