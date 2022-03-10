@@ -28,7 +28,9 @@ class LoginController extends Controller
     {
         $requestValidated = $request->validated();
 
-        $userLogged = $this->loginService->execute($requestValidated);
+        $loginService = $this->loginService;
+
+        $userLogged = $loginService($requestValidated);
 
         return response()->json(
             new UserLoggedResource($userLogged),

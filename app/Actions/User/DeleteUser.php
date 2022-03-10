@@ -2,6 +2,7 @@
 
 namespace App\Actions\User;
 
+use App\Actions\Auth\LogoutUser;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -17,6 +18,9 @@ class DeleteUser
         try {
 
             DB::beginTransaction();
+
+            $this->logoutAndDeleteTokensUser();
+
             $userWasDelete = $this->user->delete();
         } catch (\Exception $exception) {
             logger(
@@ -28,5 +32,10 @@ class DeleteUser
         }
 
         $userWasDelete ? DB::commit() : DB::rollBack();
+    }
+
+    private function logoutAndDeleteTokensUser(): void
+    {
+        $this->user->tokens()->delete();
     }
 }
