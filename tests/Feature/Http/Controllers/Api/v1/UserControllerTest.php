@@ -72,6 +72,23 @@ class UserControllerTest extends TestCase
 
         $this->assertNotEquals($invalidatedDataToUpdateUser[$key], $this->user->$key);
     }
+    /**
+     * 
+     * @test
+     */
+    public function show_data_user_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->getJson(
+            route(
+                'users.show'
+            )
+        );
+        $response->assertOk();
+
+        $this->assertEquals($this->user->id, $response->getData()->id);
+    }
 
     /**
      * @test
@@ -92,18 +109,18 @@ class UserControllerTest extends TestCase
 
     /**
      * @test
+     * @dataProvider userRoutesResource
      */
-    public function delete_user_should_fail_because_user_is_unauthenticated()
+    public function user_cannot_access_route_because_its_unauthenticated($route, $method)
     {
+        $methodJson = $method . "Json";
 
-        $response = $this->deleteJson(
+        $response = $this->$methodJson(
             route(
-                'users.destroy'
+                $route
             )
         );
         $response->assertUnauthorized();
-
-        $this->assertTrue((User::find($this->user->id)) !== null);
     }
 
 
@@ -162,6 +179,15 @@ class UserControllerTest extends TestCase
                 ], 'password'
             ],
 
+        ];
+    }
+
+    public function userRoutesResource(): array
+    {
+        return [
+            'Show user' => ['users.show', 'get'],
+            'Update user' => ['users.update', 'patch'],
+            'Delete user' => ['users.destroy', 'delete'],
         ];
     }
 }

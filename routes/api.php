@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(UserController::class)
         ->name('users.')
         ->group(function () {
+            Route::get('/users', 'show')->name('show');
             Route::patch('/users', 'update')->name('update');
             Route::delete('/users', 'destroy')->name('destroy');
         });

@@ -33,9 +33,11 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show()
     {
-        //
+        $userLogged = auth()->user();
+
+        return response()->json(new UserResource($userLogged));
     }
 
     /**
