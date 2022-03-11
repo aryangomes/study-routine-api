@@ -9,13 +9,12 @@ use App\Http\Resources\Subject\SubjectCollection;
 use App\Http\Resources\Subject\SubjectResource;
 use App\Models\Subject;
 use App\Services\CrudModelOperationsService;
-use App\Services\Subject\SubjectCrudService;
 use Illuminate\Http\Response;
 
 class SubjectController extends Controller
 {
     private CrudModelOperationsService $crudModelOperationsService;
-    public function __construct(private SubjectCrudService $subjectCrudService)
+    public function __construct()
     {
         $this->crudModelOperationsService = new CrudModelOperationsService(new Subject());
     }
