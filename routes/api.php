@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\Auth\LogoutController;
 use App\Http\Controllers\Api\v1\Auth\RegisterUserController;
+use App\Http\Controllers\Api\v1\SubjectController;
 use App\Http\Controllers\Api\v1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,9 @@ Route::middleware('auth:sanctum')->get('/logout', LogoutController::class)->name
  */
 Route::middleware('auth:sanctum')->group(function () {
 
+    /**
+     * User Resource Controller Routes
+     */
     Route::controller(UserController::class)
         ->name('users.')
         ->group(function () {
@@ -42,4 +46,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/users', 'update')->name('update');
             Route::delete('/users', 'destroy')->name('destroy');
         });
+
+    /**
+     *  Subject Resource Controller Routes
+     */
+    Route::apiResource('subjects', SubjectController::class);
 });

@@ -4,7 +4,7 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use App\Exceptions\Crud\RegisterRecordFailException;
+use App\Exceptions\CrudModelOperations\RegisterRecordFailException;
 
 class RegisterUser
 {

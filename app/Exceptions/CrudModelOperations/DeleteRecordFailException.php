@@ -10,7 +10,7 @@ class DeleteRecordFailException extends Exception
     public function __construct(Model $model)
     {
         $modelClassName = ((new \ReflectionClass($model))->getShortName());
-        $this->message = __('crud_model_operations.delete.failed', [
+        $this->message = __('crud_model_operations.delete_failed', [
             'model' => $modelClassName
         ]);
     }

@@ -10,7 +10,7 @@ class UpdateRecordFailException extends Exception
     public function __construct(Model $model)
     {
         $modelClassName = ((new \ReflectionClass($model))->getShortName());
-        $this->message = __('crud_model_operations.update.failed', [
+        $this->message = __('crud_model_operations.update_failed', [
             'model' => $modelClassName
         ]);
     }

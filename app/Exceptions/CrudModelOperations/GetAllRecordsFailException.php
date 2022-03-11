@@ -10,7 +10,7 @@ class GetAllRecordsFailException extends Exception
     public function __construct(Model $model)
     {
         $modelClassName = ((new \ReflectionClass($model))->getShortName());
-        $this->message = __('crud_model_operations.get_all.failed', [
+        $this->message = __('crud_model_operations.get_all_failed', [
             'model' => $modelClassName
         ]);
     }
