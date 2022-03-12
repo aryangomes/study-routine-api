@@ -8,15 +8,16 @@ use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Http\Resources\Subject\SubjectCollection;
 use App\Http\Resources\Subject\SubjectResource;
 use App\Models\Subject;
-use App\Services\CrudModelOperationsService;
+use App\Services\Subject\SubjectService;
 use Illuminate\Http\Response;
 
 class SubjectController extends Controller
 {
-    private CrudModelOperationsService $crudModelOperationsService;
+
+    private SubjectService $subjectService;
     public function __construct()
     {
-        $this->crudModelOperationsService = new CrudModelOperationsService(new Subject());
+        $this->subjectService = new SubjectService(new Subject());
     }
     /**
      * Display a listing of the resource.
@@ -25,7 +26,7 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        $collection = $this->crudModelOperationsService->getAll();
+        $collection = $this->subjectService->getAll();
 
         return response()->json(new SubjectCollection($collection));
     }
@@ -38,9 +39,10 @@ class SubjectController extends Controller
      */
     public function store(StoreSubjectRequest $request)
     {
+
         $validatedData = $request->validated();
 
-        $subjectCreated = $this->crudModelOperationsService->create($validatedData);
+        $subjectCreated = $this->subjectService->create($validatedData);
 
         return response()->json(
             new SubjectResource($subjectCreated),
@@ -56,6 +58,8 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
+        $this->authorize('view', $subject);
+
         return response()->json(new SubjectResource($subject));
     }
 
@@ -68,13 +72,15 @@ class SubjectController extends Controller
      */
     public function update(UpdateSubjectRequest $request, Subject $subject)
     {
+        $this->authorize('update', $subject);
+
         $validatedData = $request->validated();
 
-
-        $subjectUpdate = $this->crudModelOperationsService->update($subject, $validatedData);
+        $subjectUpdated =
+            $this->subjectService->update($subject, $validatedData);
 
         return response()->json(
-            new SubjectResource($subject),
+            new SubjectResource($subjectUpdated),
         );
     }
 
@@ -86,7 +92,9 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        $this->crudModelOperationsService->delete($subject);
+        $this->authorize('delete', $subject);
+
+        $this->subjectService->delete($subject);
 
         return response(status: Response::HTTP_NO_CONTENT);
     }

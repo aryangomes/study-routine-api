@@ -203,6 +203,26 @@ class SubjectControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    /**
+     * @test
+     * @dataProvider subjectRoutesResourceWithPolicies
+     */
+    public function user_cannot_perform_this_action_because_it_is_unauthorized($route, $method)
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $methodJson = $method . "Json";
+
+        $response = $this->$methodJson(
+            route(
+                $route,
+                ['subject' => $this->subject]
+            )
+        );
+
+        $response->assertStatus(403);
+    }
+
     //DATA PROVIDERS
 
     public function validatedDataToUpdateSubject(): array
@@ -272,8 +292,19 @@ class SubjectControllerTest extends TestCase
     {
         return [
             'Show subject' => ['subjects.show', 'get'],
+            'Get all subjects' => ['subjects.index', 'get'],
             'Update subject' => ['subjects.update', 'patch'],
             'Delete subject' => ['subjects.destroy', 'delete'],
+        ];
+    }
+
+    public function subjectRoutesResourceWithPolicies(): array
+    {
+        return [
+            'User cannot view subject' => ['subjects.show', 'get'],
+            // 'Get all subjects' => ['subjects.index', 'get'],
+            'User cannot update subject' => ['subjects.update', 'patch'],
+            'User cannot delete subject' => ['subjects.destroy', 'delete'],
         ];
     }
 }
