@@ -7,18 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Subject
+ * Class Subject
+ * 
+ * @property int $ids
+ * @property string $name 
+ * @property int $user_id 
  */
 class Subject extends Model
 {
     use HasFactory;
-
-    /**
-     *
-     * @property int $ids
-     * @property string $name 
-     * @property int $user_id 
-     */
 
     protected $fillable = [
         'name',
