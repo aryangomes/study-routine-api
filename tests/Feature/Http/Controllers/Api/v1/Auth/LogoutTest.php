@@ -8,6 +8,10 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
+
+/**
+ * @group authentication
+ */
 class LogoutTest extends TestCase
 {
     use  RefreshDatabase, WithFaker;

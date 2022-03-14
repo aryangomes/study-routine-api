@@ -10,11 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class Login
 {
-    public function __construct()
-    {
-    }
-
-    public function execute(array $dataToLogin): User
+    public function __invoke(array $dataToLogin): User
     {
         $user = User::where('email', $dataToLogin['email'])->first();
 

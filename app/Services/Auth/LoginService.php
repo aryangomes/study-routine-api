@@ -18,7 +18,9 @@ class LoginService
 
     public function __invoke(array $dataToLogin)
     {
-        $userLogged = $this->login->execute($dataToLogin);
+        $loginAction = $this->login;
+
+        $userLogged = $loginAction($dataToLogin);
 
         $this->createTokenToUser->execute($userLogged);
 

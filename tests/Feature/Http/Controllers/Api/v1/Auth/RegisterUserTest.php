@@ -7,6 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
+
+/**
+ * @group authentication
+ */
 class RegisterUserTest extends TestCase
 {
     use  RefreshDatabase, WithFaker;
@@ -40,7 +44,7 @@ class RegisterUserTest extends TestCase
         ];
         $response = $this->postJson(route('auth.register'), $userDataToRegister);
 
-        $response->assertStatus(201);
+        $response->assertCreated();
 
         $this->assertEquals($userDataToRegister['email'], User::find($response->getData()->id)->email);
     }
@@ -76,7 +80,7 @@ class RegisterUserTest extends TestCase
      */
     public function user_register_should_fail_because_user_already_exists($duplicateDataToRegister)
     {
-        $userDataToRegister = User::factory()->create(
+        User::factory()->create(
             [
                 'email' => $this->uniqueEmail,
                 'username' => $this->uniqueUsername,

@@ -20,7 +20,6 @@ class LogoutUser
 
             $currentAccessTokenWasDelete = $userLogged->tokens()->where('id', $tokenId)->delete();
         } catch (\Exception $exception) {
-            logger($exception->getMessage());
         }
 
         $currentAccessTokenWasDelete ? DB::commit() : DB::rollBack();

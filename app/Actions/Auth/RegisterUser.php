@@ -12,7 +12,7 @@ class RegisterUser
     {
     }
 
-    public function execute(array $userData): null|User
+    public function __invoke(array $userData): null|User
     {
         $registeredUser = null;
         try {
@@ -22,7 +22,7 @@ class RegisterUser
 
             DB::commit();
         } catch (RegisterRecordFailException $exception) {
-            logger($exception->getMessage());
+
             DB::rollBack();
         }
 

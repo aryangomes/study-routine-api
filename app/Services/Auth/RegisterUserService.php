@@ -15,9 +15,12 @@ class RegisterUserService
     {
     }
 
-    public function execute(array $userData): User
+    public function registerUser(array $userData): User
     {
-        $registeredUser = $this->registerUser->execute($userData);
+        $registerUserAction = $this->registerUser;
+
+        $registeredUser = $registerUserAction($userData);
+
         return $registeredUser;
     }
 }

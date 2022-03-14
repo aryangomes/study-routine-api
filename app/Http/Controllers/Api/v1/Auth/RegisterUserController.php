@@ -15,7 +15,6 @@ class RegisterUserController extends Controller
 {
     public function __construct(
         private RegisterUserService $registerUserService,
-        private CreateTokenToUser $createTokenToUser,
         private LoginService $loginService,
     ) {
     }
@@ -30,13 +29,18 @@ class RegisterUserController extends Controller
     {
         $validatedData = $request->validated();
 
-        $this->registerUserService->execute($validatedData);
+        $this->registerUserService->registerUser($validatedData);
 
         $userLogged = $this->loginRegisteredUser($validatedData);
 
         return response()->json(new UserLoggedResource($userLogged), Response::HTTP_CREATED);
     }
 
+    /**
+     * Login to the registered User
+     * @param array $registeredUserData
+     * @return \App\Models\User
+     */
     private function loginRegisteredUser(array $registeredUserData)
     {
         $dataToLoginRegisteredUser = [

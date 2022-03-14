@@ -7,6 +7,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
+/**
+ * @group authentication
+ */
 class LoginTest extends TestCase
 {
     use  RefreshDatabase, WithFaker;
@@ -38,7 +41,7 @@ class LoginTest extends TestCase
             $this->credentialsToLogin
         );
 
-        $response->assertStatus(200);
+        $response->assertOk();
     }
 
     /**
