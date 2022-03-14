@@ -15,6 +15,7 @@ class UserController extends Controller
 
     public function __construct()
     {
+        $this->userService = new UserService(new User);
     }
 
     /**
@@ -35,7 +36,7 @@ class UserController extends Controller
      */
     public function show()
     {
-        $userLogged = auth()->user();
+        $userLogged = $this->getUserFromAuthUser();
 
         return response()->json(new UserResource($userLogged));
     }
@@ -51,11 +52,9 @@ class UserController extends Controller
 
         $validatedData = $request->validated();
 
-        $userLogged = auth()->user();
+        $userLogged = $this->getUserFromAuthUser();
 
-        $this->userService = new UserService($userLogged);
-
-        $this->userService->updateUser($validatedData);
+        $this->userService->update($userLogged, $validatedData);
 
         return response()->json(new UserResource($userLogged));
     }
@@ -68,12 +67,20 @@ class UserController extends Controller
     public function destroy()
     {
 
-        $userLogged = auth()->user();
+        $userLogged = $this->getUserFromAuthUser();
 
-        $this->userService = new UserService($userLogged);
-
-        $this->userService->deleteUser();
+        $this->userService->delete($userLogged);
 
         return response(status: Response::HTTP_NO_CONTENT);
+    }
+    /**
+     * Get User from Auth User
+     * @return User
+     */
+    private function getUserFromAuthUser(): User
+    {
+        $userLogged = User::find(auth()->user()->id);
+
+        return $userLogged;
     }
 }

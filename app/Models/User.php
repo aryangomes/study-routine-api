@@ -10,6 +10,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+
+/**
+ * Class User
+ * 
+ * @property string $id
+ * @property string $name
+ * @property string $username
+ * @property string $email
+ * @property string $password
+ * @property string $user_avatar_path
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, Uuid;
@@ -54,6 +65,7 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($password)
     {
+
         $this->attributes['password'] = bcrypt($password);
     }
 
