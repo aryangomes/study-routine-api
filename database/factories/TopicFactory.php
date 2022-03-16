@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Examables\Test;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
+use Illuminate\Foundation\Testing\WithFaker;
 
-class SubjectFactory extends Factory
+class TopicFactory extends Factory
 {
+    use WithFaker;
     /**
      * Define the model's default state.
      *
@@ -16,8 +17,8 @@ class SubjectFactory extends Factory
     public function definition()
     {
         return [
-            'name' => Str::random(),
-            'user_id' => User::factory()->create(),
+            'name' => $this->faker->word(),
+            'test_id' => Test::factory()->create(),
         ];
     }
 }

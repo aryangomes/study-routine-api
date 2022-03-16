@@ -145,6 +145,10 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'subject_id' => [
+            'exists' => 'Subject does not exist.',
+        ],
+
     ],
 
     /*
@@ -158,6 +162,8 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'topics.*.name' => 'topic name',
+    ],
 
 ];
