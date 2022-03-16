@@ -18,41 +18,25 @@ class TestService extends CrudModelOperationsService
     {
     }
 
-    //TO DO 
     public function create(array $dataToCreate): Model
     {
         $dataToCreateCollection = collect($dataToCreate);
-        //CREATE A EXAM
-        $createExamAction = new Create(new Exam());
 
-        $examCreated = $createExamAction($this->filterDataToCreateExam($dataToCreateCollection));
+        $examCreated = $this->storeExam($dataToCreateCollection);
 
         $dataToCreateCollection->put('exam_id', $examCreated->id);
 
-        //CREATE A TEST
+        $testCreated = $this->storeTest($dataToCreateCollection);
 
-        $createTestAction = new Create(new Test());
+        $dataToCreateCollection->put('test_id', $testCreated->id);
 
-        $testCreated = $createTestAction($this->filterDataToCreateTest($dataToCreateCollection));
+        $hasTestsTopicToStore = ($dataToCreateCollection->has('topics') &&
+            ($dataToCreateCollection->count() > 0));
 
-        $dataToCreateCollection->put(
-            'test_id',
-            $testCreated->id
-        );
-
-        //STORE TOPIC'S TEST
-
-        if ($dataToCreateCollection->has('topics')) {
-
-            $topicsToBeCreated = $this->filterDataToCreateTopic($dataToCreateCollection);
-            $createTopicAction = new Create(new Topic());
-
-            $topicsToBeCreated->each(function ($item) use ($createTopicAction, $dataToCreateCollection) {
-                $item['test_id'] = $dataToCreateCollection['test_id'];
-
-                $createTopicAction($item);
-            });
+        if ($hasTestsTopicToStore) {
+            $this->storeTopicTest($dataToCreateCollection);
         }
+
         return $testCreated;
     }
 
@@ -82,5 +66,36 @@ class TestService extends CrudModelOperationsService
         $collectionDataToCreate = $dataToCreate->only('topics')->flatten(1);
 
         return $collectionDataToCreate;
+    }
+
+    private function storeExam($dataToCreate): Exam
+    {
+        $createExamAction = new Create(new Exam());
+
+        $examCreated = $createExamAction($this->filterDataToCreateExam($dataToCreate));
+
+        return $examCreated;
+    }
+
+    private function storeTest($dataToCreate): Test
+    {
+        $createTestAction = new Create(new Test());
+
+        $testCreated = $createTestAction($this->filterDataToCreateTest($dataToCreate));
+
+        return $testCreated;
+    }
+
+    private function storeTopicTest($dataToCreate): void
+    {
+        $topicsToBeCreated = $this->filterDataToCreateTopic($dataToCreate);
+
+        $createTopicAction = new Create(new Topic());
+
+        $topicsToBeCreated->each(function ($item) use ($createTopicAction, $dataToCreate) {
+            $item['test_id'] = $dataToCreate['test_id'];
+
+            $createTopicAction($item);
+        });
     }
 }

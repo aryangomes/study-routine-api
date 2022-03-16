@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Class Test
+ * Class Test 
  * 
  * Test is a Exam
  * 
  * @property int $id
  * @property int $exam_id
+ * 
  */
 class Test extends Model
 {

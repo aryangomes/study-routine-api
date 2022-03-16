@@ -81,28 +81,12 @@ class ExamTestsControllerTest extends TestCase
     public function register_exam_test_should_fail_because_data_is_not_valid($invalidatedDataToCreateExamTest)
     {
         Sanctum::actingAs($this->user);
-        logger(
-            get_class($this),
-            [
-                'defaultData' => $this->defaultData,
-                'invalidatedDataToCreateExamTest' => $invalidatedDataToCreateExamTest,
-            ]
-        );
 
         $response = $this->postJson(
             route('tests.store'),
             $invalidatedDataToCreateExamTest
         );
 
-
-        $dataFromResponse = $response->getData();
-        logger(
-            get_class($this),
-            [
-
-                'dataFromResponse' => $dataFromResponse,
-            ]
-        );
         $response->assertUnprocessable();
     }
 
@@ -136,7 +120,7 @@ class ExamTestsControllerTest extends TestCase
                 ])->toArray()
             ],
 
-            'Topics' => [
+            'Topics has not name' => [
                 collect($this->defaultData)->replace([
                     'topics' => [
                         ['name' => ''],
@@ -145,6 +129,17 @@ class ExamTestsControllerTest extends TestCase
                     ]
                 ])->toArray()
             ],
+
+            'Topics has empty topic' => [
+                collect($this->defaultData)->replace([
+                    'topics' => [
+                        [],
+                        [],
+                        [],
+                    ]
+                ])->toArray()
+            ],
+
         ];
     }
 }

@@ -37,13 +37,7 @@ class ExamTestsController extends Controller
     public function store(StoreTestRequest $request)
     {
         $validatedData = $request->validated();
-        logger(
-            get_class($this),
-            [
-                '$validatedData' => $validatedData
-            ]
 
-        );
         $testCreated = $this->testService->create($validatedData);
 
         return response()->json(new TestResource($testCreated), Response::HTTP_CREATED);
