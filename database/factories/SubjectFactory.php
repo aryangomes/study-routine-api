@@ -16,7 +16,7 @@ class SubjectFactory extends Factory
     public function definition()
     {
         return [
-            'name' => Str::random(20),
+            'name' => Str::random(),
             'user_id' => User::factory()->create(),
         ];
     }

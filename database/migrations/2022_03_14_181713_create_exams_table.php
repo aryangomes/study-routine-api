@@ -15,11 +15,11 @@ class CreateExamsTable extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('effectiveDate');
-            $table->foreignId('subject_id');
+            $table->timestamp('effective_date');
             $table->timestamps();
 
-            $table->index('subject_id')->constrained();
+            $table->foreignId('subject_id')->constrained();
+            $table->index('subject_id');
         });
     }
 

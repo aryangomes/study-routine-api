@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Subject;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ExamFactory extends Factory
@@ -14,7 +15,8 @@ class ExamFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'subject_id' => Subject::factory()->create(),
+            'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
         ];
     }
 }

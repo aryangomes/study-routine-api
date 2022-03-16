@@ -6,12 +6,13 @@ use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Exam
  * 
  * @property int $id
- * @property DateTime $effectiveDate
+ * @property DateTime $effective_date
  * @property int $subject_id
  * 
  */
@@ -25,7 +26,8 @@ final class Exam extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'effectiveDate'
+        'effective_date',
+        'subject_id',
     ];
 
     /**
@@ -34,7 +36,7 @@ final class Exam extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'effectiveDate' => 'datetime:Y-m-d H:m:i',
+        'effective_date' => 'datetime:Y-m-d H:m:i',
     ];
 
     /**
@@ -45,5 +47,15 @@ final class Exam extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * Get the test associated with the Exam
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function test(): HasOne
+    {
+        return $this->hasOne(Test::class, 'exam_id', 'id');
     }
 }
