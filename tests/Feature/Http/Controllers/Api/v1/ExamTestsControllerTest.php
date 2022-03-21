@@ -4,7 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1;
 
 use App\Models\Exam;
 use App\Models\Subject;
-use App\Models\Test;
+use App\Models\Examables\Test;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -60,12 +60,10 @@ class ExamTestsControllerTest extends TestCase
             ]
         )->toArray();
 
-
         $response = $this->postJson(
             route('tests.store'),
             $dataToCreateTest
         );
-
 
         $response->assertCreated();
 
@@ -94,7 +92,8 @@ class ExamTestsControllerTest extends TestCase
     public function invalidatedDataToCreateExamTest(): array
     {
 
-        $this->defaultData['effective_date'] = now()->addDays(7)->toDateTimeString();
+        $this->defaultData['effective_date'] =
+            now()->addDays(7)->toDateTimeString();
 
 
         return [
@@ -110,7 +109,8 @@ class ExamTestsControllerTest extends TestCase
                 )->toArray()
             ],
             'Effective date is missing' => [
-                collect($this->defaultData)->forget('effective_date')->toArray()
+                collect($this->defaultData)
+                    ->forget('effective_date')->toArray()
             ],
 
             'Effective date before today' => [

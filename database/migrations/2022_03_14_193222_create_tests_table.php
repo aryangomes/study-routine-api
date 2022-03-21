@@ -16,9 +16,6 @@ class CreateTestsTable extends Migration
         Schema::create('tests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-
-            $table->foreignId('exam_id')->constrained();
-            $table->index('exam_id');
         });
     }
 

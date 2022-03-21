@@ -1,9 +1,7 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Examables;
 
-use App\Models\Exam;
-use App\Models\Topic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TestFactory extends Factory
@@ -16,9 +14,7 @@ class TestFactory extends Factory
     public function definition()
     {
         return [
-
-            'exam_id' => Exam::factory()->create(),
-
+            //
         ];
     }
 }

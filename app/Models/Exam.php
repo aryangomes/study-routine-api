@@ -6,7 +6,7 @@ use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * Class Exam
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $subject_id
  * 
  */
-final class Exam extends Model
+class Exam extends Model
 {
     use HasFactory;
 
@@ -28,6 +28,8 @@ final class Exam extends Model
     protected $fillable = [
         'effective_date',
         'subject_id',
+        'examable_id',
+        'examable_type',
     ];
 
     /**
@@ -49,13 +51,17 @@ final class Exam extends Model
         return $this->belongsTo(Subject::class);
     }
 
+
     /**
-     * Get the test associated with the Exam
+     * Get "examble" model
+     * 
+     * A examble model can be a
+     *  - App\Models\Examables\Test
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return MorphTo
      */
-    public function test(): HasOne
+    public function examable()
     {
-        return $this->hasOne(Test::class, 'exam_id', 'id');
+        return $this->morphTo();
     }
 }

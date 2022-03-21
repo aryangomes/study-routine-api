@@ -18,6 +18,8 @@ class CreateExamsTable extends Migration
             $table->timestamp('effective_date');
             $table->timestamps();
 
+            $table->morphs('examable');
+
             $table->foreignId('subject_id')->constrained();
             $table->index('subject_id');
         });

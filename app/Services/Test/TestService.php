@@ -4,8 +4,9 @@
 namespace App\Services\Test;
 
 use App\Actions\CrudModelOperations\Create;
+use App\Actions\Exam\CreateExam;
 use App\Models\Exam;
-use App\Models\Test;
+use App\Models\Examables\Test;
 use App\Models\Topic;
 use App\Services\CrudModelOperationsService;
 use Illuminate\Database\Eloquent\Model;
@@ -22,13 +23,9 @@ class TestService extends CrudModelOperationsService
     {
         $dataToCreateCollection = collect($dataToCreate);
 
-        $examCreated = $this->storeExam($dataToCreateCollection);
+        $this->test = $this->storeTest($dataToCreateCollection);
 
-        $dataToCreateCollection->put('exam_id', $examCreated->id);
-
-        $testCreated = $this->storeTest($dataToCreateCollection);
-
-        $dataToCreateCollection->put('test_id', $testCreated->id);
+        $this->storeExam($dataToCreateCollection);
 
         $hasTestsTopicToStore = ($dataToCreateCollection->has('topics') &&
             ($dataToCreateCollection->count() > 0));
@@ -37,27 +34,24 @@ class TestService extends CrudModelOperationsService
             $this->storeTopicTest($dataToCreateCollection);
         }
 
-        return $testCreated;
+        return $this->test;
     }
 
     private function filterDataToCreateExam(Collection $dataToCreate): array
     {
+
         $collectionDataToCreate = $dataToCreate->only(
             ['subject_id', 'effective_date']
         );
 
+        $collectionDataToCreate->put('examable_id', $this->test->id);
+
+        $collectionDataToCreate->put('examable_type', $this->test::class);
+
+
         $dataToCreateExam = $collectionDataToCreate->toArray();
 
         return $dataToCreateExam;
-    }
-
-    private function filterDataToCreateTest(Collection $dataToCreate): array
-    {
-        $collectionDataToCreate = $dataToCreate->only(['name', 'exam_id']);
-
-        $dataToCreateTest = $collectionDataToCreate->toArray();
-
-        return $dataToCreateTest;
     }
 
 
@@ -77,11 +71,11 @@ class TestService extends CrudModelOperationsService
         return $examCreated;
     }
 
-    private function storeTest($dataToCreate): Test
+    private function storeTest(): Test
     {
         $createTestAction = new Create(new Test());
 
-        $testCreated = $createTestAction($this->filterDataToCreateTest($dataToCreate));
+        $testCreated = $createTestAction([]);
 
         return $testCreated;
     }
@@ -93,7 +87,7 @@ class TestService extends CrudModelOperationsService
         $createTopicAction = new Create(new Topic());
 
         $topicsToBeCreated->each(function ($item) use ($createTopicAction, $dataToCreate) {
-            $item['test_id'] = $dataToCreate['test_id'];
+            $item['test_id'] = $this->test->id;
 
             $createTopicAction($item);
         });

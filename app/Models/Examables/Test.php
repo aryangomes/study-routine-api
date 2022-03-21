@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Examables;
 
+use App\Models\Exam;
+use App\Models\Topic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * Class Test 
@@ -26,9 +28,7 @@ class Test extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'exam_id',
-    ];
+    // protected $fillable = [];
 
     /**
      * Get all of the topics for the Test
@@ -41,12 +41,12 @@ class Test extends Model
     }
 
     /**
-     * Get the exam that owns the Test
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Get Exam's Test
+     * @return MorphOne
      */
-    public function exam(): BelongsTo
+
+    public function exam(): MorphOne
     {
-        return $this->belongsTo(Exam::class, 'exam_id', 'id');
+        return $this->morphOne(Exam::class, 'examable');
     }
 }
