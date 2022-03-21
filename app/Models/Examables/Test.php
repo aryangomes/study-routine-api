@@ -49,4 +49,17 @@ class Test extends Model
     {
         return $this->morphOne(Exam::class, 'examable');
     }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($test) {
+
+            $test->exam->delete();
+        });
+    }
 }

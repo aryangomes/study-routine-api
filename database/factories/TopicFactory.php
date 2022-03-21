@@ -18,7 +18,7 @@ class TopicFactory extends Factory
     {
         return [
             'name' => $this->faker->word(),
-            'test_id' => Test::factory()->create(),
+
         ];
     }
 }

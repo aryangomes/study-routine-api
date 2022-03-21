@@ -13,7 +13,7 @@ class UpdateTestRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,8 @@ class UpdateTestRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'effective_date' => ['sometimes', 'required', 'after_or_equal:today'],
+
         ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services\Test;
+namespace App\Services\ExamTest;
 
 use App\Actions\CrudModelOperations\Create;
 use App\Actions\Exam\CreateExam;
@@ -12,11 +12,12 @@ use App\Services\CrudModelOperationsService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class TestService extends CrudModelOperationsService
+class ExamTestService extends CrudModelOperationsService
 {
 
     public function __construct(private Test $test)
     {
+        parent::__construct($test);
     }
 
     public function create(array $dataToCreate): Model
@@ -35,6 +36,15 @@ class TestService extends CrudModelOperationsService
         }
 
         return $this->test;
+    }
+
+    public function update(Model $model, array $dataToUpdate): Model
+    {
+        $updateAction  = $this->updateAction;
+
+        ($updateAction($model->exam, $dataToUpdate));
+
+        return $model;
     }
 
     private function filterDataToCreateExam(Collection $dataToCreate): array

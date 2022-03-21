@@ -53,7 +53,7 @@ class Exam extends Model
 
 
     /**
-     * Get "examble" model
+     * Get "examable" model
      * 
      * A examble model can be a
      *  - App\Models\Examables\Test
