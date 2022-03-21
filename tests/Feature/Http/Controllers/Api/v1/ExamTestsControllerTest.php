@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
+use App\Http\Resources\Test\TestResource;
 use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\Examables\Test;
@@ -18,6 +19,7 @@ class ExamTestsControllerTest extends TestCase
 
     private User $user;
     private Subject $subject;
+    private Exam $examTest;
     private array $defaultData =
     [
         'subject_id' => 1,
@@ -38,6 +40,12 @@ class ExamTestsControllerTest extends TestCase
         $this->subject = Subject::factory()->create([
             'user_id' => $this->user->id
         ]);
+
+        $this->examTest = Exam::factory()->create(
+            [
+                'subject_id' => $this->subject->id
+            ]
+        );
 
         $this->withMiddleware('auth:sanctum');
     }
@@ -86,6 +94,121 @@ class ExamTestsControllerTest extends TestCase
         );
 
         $response->assertUnprocessable();
+    }
+
+    /**
+     * @test
+     */
+    public function show_exam_test_successfully()
+    {
+
+        Sanctum::actingAs($this->user);
+
+        $response = $this->getJson(
+            route(
+                'tests.show',
+                ['test' => $this->examTest->examable]
+            )
+        );
+        $dataFromResponse = $response->getData();
+
+        $response->assertOk();
+
+        $response->assertJsonPath('exam.effective_date', $dataFromResponse->exam->effective_date);
+    }
+
+    /**
+     * @test
+     */
+    public function get_all_exam_tests_successfully()
+    {
+        $examTests = Exam::factory()->count(
+            $this->faker()->randomDigitNotZero()
+        )->create();
+
+        $examTests->each(function ($exam) {
+            (Topic::factory()
+                ->count($this->faker()->randomDigitNotZero())
+                ->create([
+                    'test_id' => $exam->examable_id
+                ]));
+        });
+
+        Sanctum::actingAs($this->user);
+
+        $response = $this->getJson(
+            route(
+                'tests.index'
+            )
+        );
+
+        $response->assertOk();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function exam_test_updated_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+
+        $dataToUpdateTest =
+            [
+                'effective_date' => Exam::factory()->make()->effective_date,
+            ];
+
+        $response = $this->patchJson(
+            route('tests.update', [
+                'test' =>
+                $this->examTest->examable
+            ]),
+            $dataToUpdateTest
+        );
+
+        $response->assertOk();
+
+        $this->assertEquals($dataToUpdateTest['effective_date'], Test::find($response->getData()->id)->exam->effective_date);
+    }
+
+    /**
+     * 
+     * @test
+     * 
+     * @dataProvider invalidatedDataToUpdateExamTest
+     */
+    public function update_exam_test_should_fail_because_data_is_not_valid($invalidatedDataToUpdateExamTest)
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->patchJson(
+            route('tests.update', [
+                'test' => $this->examTest->examable
+            ]),
+            $invalidatedDataToUpdateExamTest
+        );
+
+        $response->assertUnprocessable();
+    }
+
+    /**
+     * @test
+     */
+    public function delete_exam_test_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->deleteJson(
+            route(
+                'tests.destroy',
+                ['test' => $this->examTest->examable]
+            )
+        );
+        $response->assertNoContent();
+
+        $this->assertDeleted('exams', $this->examTest->toArray());
+        $this->assertDeleted('tests', $this->examTest->examable->toArray());
     }
 
     //DATA PROVIDERS
@@ -139,6 +262,23 @@ class ExamTestsControllerTest extends TestCase
                     ]
                 ])->toArray()
             ],
+
+        ];
+    }
+
+    public function invalidatedDataToUpdateExamTest(): array
+    {
+
+        return [
+
+
+            'Effective date before today' => [
+                collect($this->defaultData)->replace([
+                    'effective_date' =>
+                    now()->subDays(7)->toDateTimeString()
+                ])->toArray()
+            ],
+
 
         ];
     }

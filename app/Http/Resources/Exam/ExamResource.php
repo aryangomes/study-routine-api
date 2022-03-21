@@ -19,6 +19,7 @@ class ExamResource extends JsonResource
             'id' => $this->id,
             'effective_date' => $this->effective_date,
             'subject' => new SubjectResource($this->subject),
+            'examable' => $this->examable,
         ];
     }
 }

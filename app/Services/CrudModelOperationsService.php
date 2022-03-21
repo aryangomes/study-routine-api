@@ -13,10 +13,10 @@ use Illuminate\Database\Eloquent\Model;
 class CrudModelOperationsService
 {
 
-    private GetAll $getAllAction;
-    private Create $createAction;
-    private Update $updateAction;
-    private Delete $deleteAction;
+    protected GetAll $getAllAction;
+    protected Create $createAction;
+    protected Update $updateAction;
+    protected Delete $deleteAction;
     public function __construct(private Model $model)
     {
         $this->getAllAction = new GetAll($model);

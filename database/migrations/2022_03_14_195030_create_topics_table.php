@@ -18,7 +18,10 @@ class CreateTopicsTable extends Migration
             $table->string('name', 150);
             $table->timestamps();
 
-            $table->foreignId('test_id')->constrained();
+            $table->foreignId('test_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->index('test_id');
         });
     }
