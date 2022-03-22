@@ -55,6 +55,7 @@ class ExamTestsController extends Controller
     public function show(Test $test)
     {
 
+        $this->authorize('view', $test);
         return response()->json(new TestResource($test));
     }
 
@@ -67,6 +68,7 @@ class ExamTestsController extends Controller
      */
     public function update(UpdateTestRequest $request, Test $test)
     {
+        $this->authorize('update', $test);
         $validatedData = $request->validated();
 
         $testUpdate = $this->examTestService->update($test, $validatedData);
@@ -82,6 +84,7 @@ class ExamTestsController extends Controller
      */
     public function destroy(Test $test)
     {
+        $this->authorize('delete', $test);
         $this->examTestService->delete($test);
 
         return response(status: Response::HTTP_NO_CONTENT);

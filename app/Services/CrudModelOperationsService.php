@@ -7,8 +7,9 @@ use App\Actions\CrudModelOperations\Create;
 use App\Actions\CrudModelOperations\Delete;
 use App\Actions\CrudModelOperations\GetAll;
 use App\Actions\CrudModelOperations\Update;
-use Illuminate\Database\Eloquent\Collection;
+
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class CrudModelOperationsService
 {
