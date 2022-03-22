@@ -4,6 +4,7 @@ namespace App\Models\Examables;
 
 use App\Models\Exam;
 use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,6 +32,19 @@ class Test extends Model
     // protected $fillable = [];
 
     /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($test) {
+
+            $test->exam->delete();
+        });
+    }
+
+    /**
      * Get all of the topics for the Test
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -51,15 +65,17 @@ class Test extends Model
     }
 
     /**
-     * The "booted" method of the model.
+     * Scope a query to only include popular users.
      *
-     * @return void
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected static function booted()
+    public function scopeOfUser($query, User $user)
     {
-        static::deleting(function ($test) {
-
-            $test->exam->delete();
-        });
+        return $query
+            ->with('exam', 'exam.subject')
+            ->whereHas('exam.subject', function ($query) use ($user) {
+                $query->where('user_id', '=', $user->id);
+            });
     }
 }
