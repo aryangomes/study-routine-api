@@ -19,6 +19,20 @@ class ExamTestService extends CrudModelOperationsService
     {
         parent::__construct($test);
     }
+    /**
+     * Get all records in the database
+     *
+     * 
+     * @return Collection
+     **/
+    public function getAll(): Collection
+    {
+        $user = auth()->user();
+
+        $getAll  = Test::ofUser($user)->get();
+
+        return $getAll;
+    }
 
     public function create(array $dataToCreate): Model
     {

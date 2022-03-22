@@ -122,9 +122,33 @@ class ExamTestsControllerTest extends TestCase
      */
     public function get_all_exam_tests_successfully()
     {
+        Sanctum::actingAs($this->user);
+
+        User::factory()->count(2)->create()->each(
+            function ($user) {
+                $subject = Subject::factory()->create([
+                    'user_id' => $user->id
+                ]);
+                $examTestsUser = Exam::factory()->count(
+                    $this->faker()->randomDigitNotZero()
+                )->create([
+                    'subject_id' => $subject->id
+                ]);
+
+                $examTestsUser->each(function ($exam) {
+                    (Topic::factory()
+                        ->count($this->faker()->randomDigitNotZero())
+                        ->create([
+                            'test_id' => $exam->examable_id
+                        ]));
+                });
+            }
+        );
         $examTests = Exam::factory()->count(
             $this->faker()->randomDigitNotZero()
-        )->create();
+        )->create([
+            'subject_id' => $this->subject->id
+        ]);
 
         $examTests->each(function ($exam) {
             (Topic::factory()
@@ -134,13 +158,12 @@ class ExamTestsControllerTest extends TestCase
                 ]));
         });
 
-        Sanctum::actingAs($this->user);
-
         $response = $this->getJson(
             route(
                 'tests.index'
             )
         );
+
 
         $response->assertOk();
     }
@@ -205,10 +228,33 @@ class ExamTestsControllerTest extends TestCase
                 ['test' => $this->examTest->examable]
             )
         );
+
         $response->assertNoContent();
 
         $this->assertDeleted('exams', $this->examTest->toArray());
         $this->assertDeleted('tests', $this->examTest->examable->toArray());
+    }
+
+    /**
+     * @test
+     * @dataProvider examTestsRoutesResourceWithPolicies
+     */
+    public function user_cannot_perform_this_action_because_it_is_unauthorized($route, $method)
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $methodJson = $method . "Json";
+
+        $response = $this->$methodJson(
+            route(
+                $route,
+                ['test' => $this->examTest->examable]
+            )
+        );
+
+        $dataFromResponse = $response->getData();
+
+        $response->assertStatus(403);
     }
 
     //DATA PROVIDERS
@@ -280,6 +326,15 @@ class ExamTestsControllerTest extends TestCase
             ],
 
 
+        ];
+    }
+
+    public function examTestsRoutesResourceWithPolicies(): array
+    {
+        return [
+            'User cannot view test' => ['tests.show', 'get'],
+            'User cannot update test' => ['tests.update', 'patch'],
+            'User cannot delete test' => ['tests.destroy', 'delete'],
         ];
     }
 }

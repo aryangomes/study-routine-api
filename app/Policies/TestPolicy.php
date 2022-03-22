@@ -6,9 +6,14 @@ use App\Models\Examables\Test;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class TestPolicy
+class TestPolicy extends BasePolicy
 {
     use HandlesAuthorization;
+
+    public function __construct()
+    {
+        $this->recordName = 'Test';
+    }
 
     /**
      * Determine whether the user can view any models.
@@ -30,7 +35,8 @@ class TestPolicy
      */
     public function view(User $user, Test $test)
     {
-        //
+        $userId = $test->exam->subject->user_id;
+        return  $this->userCanViewThisModel($user, $userId);
     }
 
     /**
@@ -53,7 +59,8 @@ class TestPolicy
      */
     public function update(User $user, Test $test)
     {
-        //
+        $userId = $test->exam->subject->user_id;
+        return  $this->userCanUpdateThisModel($user, $userId);
     }
 
     /**
@@ -65,7 +72,8 @@ class TestPolicy
      */
     public function delete(User $user, Test $test)
     {
-        //
+        $userId = $test->exam->subject->user_id;
+        return  $this->userCanDeleteThisModel($user, $userId);
     }
 
     /**
