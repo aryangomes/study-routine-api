@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1;
 
 use App\Models\Subject;
 use App\Models\User;
+use App\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class SubjectControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker;
+    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
 
     private User $user;
     private Subject $subject;
@@ -29,6 +30,8 @@ class SubjectControllerTest extends TestCase
                 'user_id' => $this->user
             ]
         );
+
+        $this->initializeModelAndModelName('subject', $this->subject);
 
         $this->withMiddleware('auth:sanctum');
     }
@@ -74,8 +77,6 @@ class SubjectControllerTest extends TestCase
         );
 
         $response->assertUnprocessable();
-
-        // $this->assertEquals($invalidatedDataToCreateSubject['name'], Subject::find($response->getData()->id)->name);
     }
 
     /**
@@ -186,42 +187,8 @@ class SubjectControllerTest extends TestCase
         $this->assertDeleted('subjects', $this->subject->toArray());
     }
 
-    /**
-     * @test
-     * @dataProvider subjectRoutesResource
-     */
-    public function user_cannot_access_route_because_its_unauthenticated($route, $method)
-    {
-        $methodJson = $method . "Json";
 
-        $response = $this->$methodJson(
-            route(
-                $route,
-                ['subject' => $this->subject]
-            )
-        );
-        $response->assertUnauthorized();
-    }
 
-    /**
-     * @test
-     * @dataProvider subjectRoutesResourceWithPolicies
-     */
-    public function user_cannot_perform_this_action_because_it_is_unauthorized($route, $method)
-    {
-        Sanctum::actingAs(User::factory()->create());
-
-        $methodJson = $method . "Json";
-
-        $response = $this->$methodJson(
-            route(
-                $route,
-                ['subject' => $this->subject]
-            )
-        );
-
-        $response->assertStatus(403);
-    }
 
     //DATA PROVIDERS
 
@@ -288,23 +255,22 @@ class SubjectControllerTest extends TestCase
         ];
     }
 
-    public function subjectRoutesResource(): array
+    public function routesResourceWithAuthentication(): array
     {
-        return [
-            'Show subject' => ['subjects.show', 'get'],
-            'Get all subjects' => ['subjects.index', 'get'],
-            'Update subject' => ['subjects.update', 'patch'],
-            'Delete subject' => ['subjects.destroy', 'delete'],
-        ];
+        $this->setModelName('subject');
+
+        return $this->makeRoutesResourceWithAuthentication();
     }
 
-    public function subjectRoutesResourceWithPolicies(): array
+    public function routesResourceWithPolicies(): array
     {
+        $this->setModelName('subject');
+
         return [
-            'User cannot view subject' => ['subjects.show', 'get'],
-            // 'Get all subjects' => ['subjects.index', 'get'],
-            'User cannot update subject' => ['subjects.update', 'patch'],
-            'User cannot delete subject' => ['subjects.destroy', 'delete'],
+
+            "User cannot view {$this->modelName} because is not authenticated" => ["{$this->modelName}s.show", 'get'],
+            "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
+            "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
         ];
     }
 }
