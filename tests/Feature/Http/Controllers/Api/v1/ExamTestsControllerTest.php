@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
-use App\Http\Resources\Test\TestResource;
 use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\Examables\Test;
 use App\Models\Topic;
 use App\Models\User;
+use App\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class ExamTestsControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker;
+    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
 
     private User $user;
     private Subject $subject;
@@ -46,6 +46,9 @@ class ExamTestsControllerTest extends TestCase
                 'subject_id' => $this->subject->id
             ]
         );
+
+        $this->initializeModelAndModelName('test', $this->examTest);
+
 
         $this->withMiddleware('auth:sanctum');
     }
@@ -235,27 +238,7 @@ class ExamTestsControllerTest extends TestCase
         $this->assertDeleted('tests', $this->examTest->examable->toArray());
     }
 
-    /**
-     * @test
-     * @dataProvider examTestsRoutesResourceWithPolicies
-     */
-    public function user_cannot_perform_this_action_because_it_is_unauthorized($route, $method)
-    {
-        Sanctum::actingAs(User::factory()->create());
 
-        $methodJson = $method . "Json";
-
-        $response = $this->$methodJson(
-            route(
-                $route,
-                ['test' => $this->examTest->examable]
-            )
-        );
-
-        $dataFromResponse = $response->getData();
-
-        $response->assertStatus(403);
-    }
 
     //DATA PROVIDERS
     public function invalidatedDataToCreateExamTest(): array
@@ -316,8 +299,6 @@ class ExamTestsControllerTest extends TestCase
     {
 
         return [
-
-
             'Effective date before today' => [
                 collect($this->defaultData)->replace([
                     'effective_date' =>
@@ -329,12 +310,22 @@ class ExamTestsControllerTest extends TestCase
         ];
     }
 
-    public function examTestsRoutesResourceWithPolicies(): array
+    public function routesResourceWithPolicies(): array
     {
+        $this->setModelName('test');
+
         return [
-            'User cannot view test' => ['tests.show', 'get'],
-            'User cannot update test' => ['tests.update', 'patch'],
-            'User cannot delete test' => ['tests.destroy', 'delete'],
+
+            "User cannot view {$this->modelName}" => ["{$this->modelName}s.show", 'get'],
+            "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
+            "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
         ];
+    }
+
+    public function routesResourceWithAuthentication(): array
+    {
+        $this->setModelName('test');
+
+        return $this->makeRoutesResourceWithAuthentication();
     }
 }
