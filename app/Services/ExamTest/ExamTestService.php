@@ -61,6 +61,19 @@ class ExamTestService extends CrudModelOperationsService
         return $model;
     }
 
+    public function addNewTopic(Test $test, array $dataToCreateNewTopic)
+    {
+        $createTestAction = new Create(new Topic());
+
+        $dataToCreateNewTopic['test_id'] = $test->id;
+
+        $createTestAction(
+            $dataToCreateNewTopic
+        );
+
+        return $test;
+    }
+
     private function filterDataToCreateExam(Collection $dataToCreate): array
     {
 
