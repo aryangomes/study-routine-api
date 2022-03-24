@@ -1,12 +1,10 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Examables;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
-class SubjectFactory extends Factory
+class TestFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -16,8 +14,7 @@ class SubjectFactory extends Factory
     public function definition()
     {
         return [
-            'name' => Str::random(),
-            'user_id' => User::factory()->create(),
+            //
         ];
     }
 }

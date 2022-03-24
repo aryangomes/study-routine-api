@@ -3,10 +3,12 @@
 use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\Auth\LogoutController;
 use App\Http\Controllers\Api\v1\Auth\RegisterUserController;
+use App\Http\Controllers\Api\v1\ExamTest\AddNewTopicController;
+use App\Http\Controllers\Api\v1\ExamTestsController;
 use App\Http\Controllers\Api\v1\SubjectController;
 use App\Http\Controllers\Api\v1\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\v1\TopicController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,4 +53,23 @@ Route::middleware('auth:sanctum')->group(function () {
      *  Subject Resource Controller Routes
      */
     Route::apiResource('subjects', SubjectController::class);
+
+    /**
+     *  Exam Tests Resource Controller Routes
+     */
+    Route::prefix('exams')->group(function () {
+
+        Route::apiResource('tests', ExamTestsController::class);
+
+        Route::post('/tests/{test}/addNewTopic', AddNewTopicController::class)
+            ->name('tests.add_new_topic');
+
+
+        //Test's Topics Resource Controller Routes
+        Route::prefix('tests')->group(
+            function () {
+                Route::apiResource('topics', TopicController::class);
+            }
+        );
+    });
 });
