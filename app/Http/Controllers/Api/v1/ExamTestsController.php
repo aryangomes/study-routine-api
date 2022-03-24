@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Test\StoreTestRequest;
 use App\Http\Requests\Test\UpdateTestRequest;
+use App\Http\Requests\Topic\StoreTopicRequest;
 use App\Http\Resources\Test\TestCollection;
 use App\Http\Resources\Test\TestResource;
 use App\Models\Examables\Test;
@@ -15,7 +16,7 @@ use Illuminate\Http\Response;
 class ExamTestsController extends Controller
 {
 
-    public function __construct(private ExamTestService $examTestService)
+    public function __construct(protected ExamTestService $examTestService)
     {
     }
 
@@ -88,5 +89,16 @@ class ExamTestsController extends Controller
         $this->examTestService->delete($test);
 
         return response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    public function addNewTopic(Test $test, StoreTopicRequest $request)
+    {
+        $validatedData = $request->validated();
+        $this->authorize('addNewTopic',  $test);
+        // $this->authorize('newTopic', $testTopic);
+
+        $testWithNewTopicCreated = $this->examTestService->addNewTopic($test, $validatedData);
+
+        return response()->json(new TestResource($testWithNewTopicCreated), Response::HTTP_CREATED);
     }
 }
