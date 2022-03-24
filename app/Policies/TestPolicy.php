@@ -35,7 +35,7 @@ class TestPolicy extends BasePolicy
      */
     public function view(User $user, Test $test)
     {
-        $userId = $test->exam->subject->user_id;
+        $userId = $this->getUserIdFromTest($test);
         return  $this->userCanViewThisModel($user, $userId);
     }
 
@@ -59,7 +59,7 @@ class TestPolicy extends BasePolicy
      */
     public function update(User $user, Test $test)
     {
-        $userId = $test->exam->subject->user_id;
+        $userId = $this->getUserIdFromTest($test);
         return  $this->userCanUpdateThisModel($user, $userId);
     }
 
@@ -72,7 +72,7 @@ class TestPolicy extends BasePolicy
      */
     public function delete(User $user, Test $test)
     {
-        $userId = $test->exam->subject->user_id;
+        $userId = $this->getUserIdFromTest($test);
         return  $this->userCanDeleteThisModel($user, $userId);
     }
 
@@ -98,5 +98,32 @@ class TestPolicy extends BasePolicy
     public function forceDelete(User $user, Test $test)
     {
         //
+    }
+
+    /**
+     * Determine whether the user can add a new topic to test.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Examables\Test $test
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function addNewTopic(User $user, Test $test)
+    {
+
+        $userId = $this->getUserIdFromTest($test);
+
+        $this->recordName = 'Topic';
+
+        return $this->userCanDoThisActionWithThisModel(
+            $user,
+            $userId,
+            'create'
+        );
+    }
+
+    private function getUserIdFromTest($test): string
+    {
+        $userId = $test->exam->subject->user_id;
+        return $userId;
     }
 }
