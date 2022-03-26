@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
 use App\Models\User;
+use App\Traits\CreateAModelFromFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker;
+    use  RefreshDatabase, WithFaker, CreateAModelFromFactory;
     private User $user;
     private string $uniqueUsername = 'uniqueUsername';
     private string $uniqueEmail = 'uniqueEmail@email.com';
@@ -19,7 +20,7 @@ class UserControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = $this->createModelFromFactory(new User);
 
         $this->withMiddleware('auth:sanctum');
     }
@@ -54,12 +55,11 @@ class UserControllerTest extends TestCase
      */
     public function update_user_should_fail_because_data_is_not_valid(array $invalidatedDataToUpdateUser, string $key)
     {
-        User::factory()->create(
-            [
-                'username' => $this->uniqueUsername,
-                'email' => $this->uniqueEmail
-            ]
-        );
+
+        $this->createModelFromFactory(new User, [
+            'username' => $this->uniqueUsername,
+            'email' => $this->uniqueEmail
+        ]);
 
         Sanctum::actingAs($this->user);
 

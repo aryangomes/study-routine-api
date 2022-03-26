@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1;
 
 use App\Models\Subject;
 use App\Models\User;
+use App\Traits\CreateAModelFromFactory;
 use App\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -13,7 +14,7 @@ use Tests\TestCase;
 
 class SubjectControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
+    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute, CreateAModelFromFactory;
 
     private User $user;
     private Subject $subject;
@@ -23,13 +24,11 @@ class SubjectControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = $this->createModelFromFactory(new User);
 
-        $this->subject = Subject::factory()->create(
-            [
-                'user_id' => $this->user
-            ]
-        );
+        $this->subject = $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user
+        ]);
 
         $this->initializeModelAndModelName('subject', $this->subject);
 
@@ -70,6 +69,10 @@ class SubjectControllerTest extends TestCase
     ) {
         Sanctum::actingAs($this->user);
 
+        $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user,
+            'name' => $this->uniqueSubjectName
+        ]);
 
         $response = $this->postJson(
             route('subjects.store'),
@@ -151,16 +154,16 @@ class SubjectControllerTest extends TestCase
      */
     public function update_subject_should_fail_because_data_is_not_valid(array $invalidatedDataToUpdateSubject, string $key)
     {
-        Subject::factory()->create(
-            [
-                'name' => $this->uniqueSubjectName,
-            ]
-        );
+
+        $subject = $this->createModelFromFactory(new Subject, [
+            'name' => $this->uniqueSubjectName,
+            'user_id' => $this->user
+        ]);
 
         Sanctum::actingAs($this->user);
 
         $response = $this->patchJson(
-            route('subjects.update', ['subject' => $this->subject]),
+            route('subjects.update', ['subject' => $subject]),
             $invalidatedDataToUpdateSubject
         );
 

@@ -54,11 +54,19 @@ abstract class BasePolicy
      * @param string $userId Property that associates the Record with User
      * @return Response
      */
-    public function userCanCreateThisModel(User $user): Response
+    public function userCanCreateThisModel(User $user, ?string $userId): Response
     {
-        $userCanDoThisActionWithThisModel =
-            $this->userIsTheAuthenticatedUser($user,  'create');
-
+        $userCanDoThisActionWithThisModel = false;
+        if (isset($userId)) {
+            $userCanDoThisActionWithThisModel = $this->userCanDoThisActionWithThisModel(
+                $user,
+                $userId,
+                'create'
+            );
+        } else {
+            $userCanDoThisActionWithThisModel =
+                $this->userIsTheAuthenticatedUser($user,  'create');
+        }
         return $userCanDoThisActionWithThisModel;
     }
 

@@ -20,35 +20,6 @@ class TopicController extends BaseApiController
     public function __construct()
     {
         $this->crudModelOperationsService = new CrudModelOperationsService(new Topic);
-        $this->authorizeResource(Topic::class, 'topic');
-    }
-
-    /**
-     * Get the map of resource methods to ability names.
-     *
-     * @return array
-     */
-    protected function resourceAbilityMap()
-    {
-        return [
-            'index' => 'viewAny',
-            'show' => 'view',
-            'create' => 'create',
-            'store' => 'create',
-            'edit' => 'update',
-            'update' => 'update',
-            'destroy' => 'delete',
-        ];
-    }
-
-    /**
-     * Get the list of resource methods which do not have model parameters.
-     *
-     * @return array
-     */
-    protected function resourceMethodsWithoutModels()
-    {
-        return ['index'];
     }
 
     /**
@@ -70,14 +41,6 @@ class TopicController extends BaseApiController
     public function store(StoreTopicRequest $request)
     {
         $this->routeNotImplemented();
-        $dataValidated = $request->validated();
-        $testTopic = Test::find($dataValidated['test_id']);
-        $this->authorize('create',  $testTopic);
-        // $this->authorize('newTopic', $testTopic);
-
-        $topicCreated = $this->crudModelOperationsService->create($dataValidated);
-
-        return response()->json(new TestResource($topicCreated->test), Response::HTTP_CREATED);
     }
 
     /**
@@ -101,11 +64,12 @@ class TopicController extends BaseApiController
     public function update(UpdateTopicRequest $request, Topic $topic)
     {
         $this->authorize('update', $topic);
+
         $dataValidated = $request->validated();
 
         $topicUpdated = $this->crudModelOperationsService->update($topic,   $dataValidated);
 
-        return response()->json(new TopicResource($topicUpdated));
+        return response()->json(new TestResource($topicUpdated->test));
     }
 
     /**

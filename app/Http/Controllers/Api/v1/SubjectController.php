@@ -14,11 +14,10 @@ use Illuminate\Http\Response;
 class SubjectController extends Controller
 {
 
-    private SubjectService $subjectService;
-    public function __construct()
+    public function __construct(private SubjectService $subjectService)
     {
-        $this->subjectService = new SubjectService(new Subject());
     }
+
     /**
      * Display a listing of the resource.
      *

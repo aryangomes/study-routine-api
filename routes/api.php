@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\Auth\LoginController;
 use App\Http\Controllers\Api\v1\Auth\LogoutController;
 use App\Http\Controllers\Api\v1\Auth\RegisterUserController;
 use App\Http\Controllers\Api\v1\ExamTest\AddNewTopicController;
+use App\Http\Controllers\Api\v1\ExamTest\GetTopicsController;
 use App\Http\Controllers\Api\v1\ExamTestsController;
 use App\Http\Controllers\Api\v1\SubjectController;
 use App\Http\Controllers\Api\v1\UserController;
@@ -63,6 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/tests/{test}/addNewTopic', AddNewTopicController::class)
             ->name('tests.add_new_topic');
+
+        Route::get('/tests/{test}/topics', GetTopicsController::class)
+            ->name('tests.get_topics');
 
 
         //Test's Topics Resource Controller Routes

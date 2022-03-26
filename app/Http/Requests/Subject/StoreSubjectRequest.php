@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Subject;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSubjectRequest extends FormRequest
 {
@@ -24,8 +25,9 @@ class StoreSubjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:150', 'unique:subjects,name'],
-            'user_id' => ['required', 'exists:users,id'],
+            'name' => ['required', 'string', 'max:150', Rule::unique('subjects')->where(function ($query) {
+                return $query->where('user_id', auth()->id());
+            })],
         ];
     }
 

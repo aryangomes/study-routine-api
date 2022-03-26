@@ -6,7 +6,7 @@ use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\User;
-use App\Traits\UserCanAccessThisRoute;
+use App\Traits\CreateAModelFromFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class AddNewTopicControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
+    use  RefreshDatabase, WithFaker, CreateAModelFromFactory;
 
     private User $user;
     private Subject $subject;
@@ -27,23 +27,26 @@ class AddNewTopicControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = $this->createModelFromFactory(new User);
 
-        $this->subject = Subject::factory()->create([
-            'user_id' => $this->user->id
+        $this->subject = $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user
         ]);
 
-        $this->examTest = Exam::factory()->create(
+        $this->examTest = $this->createModelFromFactory(
+            new Exam,
             [
                 'subject_id' => $this->subject->id
             ]
         );
 
-        $this->topic = Topic::factory()->create([
-            'test_id' => $this->examTest->examable_id
-        ]);
+        $this->topic = $this->createModelFromFactory(
+            new Topic,
+            [
+                'test_id' => $this->examTest->examable_id
+            ]
+        );
 
-        $this->initializeModelAndModelName('topic', $this->topic);
 
         $this->withMiddleware('auth:sanctum');
     }
@@ -100,6 +103,7 @@ class AddNewTopicControllerTest extends TestCase
 
         Sanctum::actingAs($this->user);
 
+
         $user = User::factory()->create();
 
         $subject = Subject::factory()->create([
@@ -145,28 +149,6 @@ class AddNewTopicControllerTest extends TestCase
             'Topic name must have 150 characters' => [
                 ['name' => Str::random(151)]
             ],
-        ];
-    }
-
-    protected function routesResourceWithAuthentication(): array
-    {
-        $this->setModelName('topic');
-
-        return [
-
-            "User cannot create {$this->modelName} because is not authenticated" => ["{$this->modelName}s.store", 'post'],
-
-        ];
-    }
-
-    protected function routesResourceWithPolicies(): array
-    {
-        $this->setModelName('topic');
-
-        return [
-
-            "User cannot create {$this->modelName}" => ["{$this->modelName}s.store", 'post'],
-
         ];
     }
 }

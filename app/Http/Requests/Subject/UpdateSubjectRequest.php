@@ -4,6 +4,7 @@ namespace App\Http\Requests\Subject;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Middleware\TrustProxies;
+use Illuminate\Validation\Rule;
 
 class UpdateSubjectRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class UpdateSubjectRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth()->id() === $this->subject->user_id;
     }
 
     /**
@@ -24,8 +25,14 @@ class UpdateSubjectRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'name' => ['sometimes', 'required', 'string', 'max:150', 'unique:subjects,name'],
+            'name' => [
+                'sometimes', 'required', 'string', 'max:150',
+                Rule::unique('subjects')->where(function ($query) {
+                    return $query->where('user_id', $this->subject->user_id);
+                }),
+            ],
         ];
     }
 

@@ -9,8 +9,8 @@ use App\Http\Requests\Topic\StoreTopicRequest;
 use App\Http\Resources\Test\TestCollection;
 use App\Http\Resources\Test\TestResource;
 use App\Models\Examables\Test;
+use App\Models\Subject;
 use App\Services\ExamTest\ExamTestService;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ExamTestsController extends Controller
@@ -41,6 +41,8 @@ class ExamTestsController extends Controller
     public function store(StoreTestRequest $request)
     {
         $validatedData = $request->validated();
+        $subject = Subject::find($validatedData['subject_id']);
+        $this->authorize('createAExam', $subject);
 
         $testCreated = $this->examTestService->create($validatedData);
 
@@ -70,6 +72,7 @@ class ExamTestsController extends Controller
     public function update(UpdateTestRequest $request, Test $test)
     {
         $this->authorize('update', $test);
+
         $validatedData = $request->validated();
 
         $testUpdate = $this->examTestService->update($test, $validatedData);
@@ -89,16 +92,5 @@ class ExamTestsController extends Controller
         $this->examTestService->delete($test);
 
         return response(status: Response::HTTP_NO_CONTENT);
-    }
-
-    public function addNewTopic(Test $test, StoreTopicRequest $request)
-    {
-        $validatedData = $request->validated();
-        $this->authorize('addNewTopic',  $test);
-        // $this->authorize('newTopic', $testTopic);
-
-        $testWithNewTopicCreated = $this->examTestService->addNewTopic($test, $validatedData);
-
-        return response()->json(new TestResource($testWithNewTopicCreated), Response::HTTP_CREATED);
     }
 }

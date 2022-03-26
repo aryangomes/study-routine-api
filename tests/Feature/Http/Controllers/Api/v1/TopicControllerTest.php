@@ -6,6 +6,7 @@ use App\Models\Exam;
 use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\User;
+use App\Traits\CreateAModelFromFactory;
 use App\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class TopicControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
+    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute, CreateAModelFromFactory;
 
     private User $user;
     private Subject $subject;
@@ -27,21 +28,25 @@ class TopicControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = $this->createModelFromFactory(new User);
 
-        $this->subject = Subject::factory()->create([
-            'user_id' => $this->user->id
+        $this->subject = $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user
         ]);
 
-        $this->examTest = Exam::factory()->create(
+        $this->examTest = $this->createModelFromFactory(
+            new Exam,
             [
                 'subject_id' => $this->subject->id
             ]
         );
 
-        $this->topic = Topic::factory()->create([
-            'test_id' => $this->examTest->examable_id
-        ]);
+        $this->topic = $this->createModelFromFactory(
+            new Topic,
+            [
+                'test_id' => $this->examTest->examable_id
+            ]
+        );
 
         $this->initializeModelAndModelName('topic', $this->topic);
 
@@ -49,12 +54,6 @@ class TopicControllerTest extends TestCase
     }
 
     //TESTS
-
-
-
-
-
-
 
     /**
      * 
@@ -78,12 +77,7 @@ class TopicControllerTest extends TestCase
             $dataToUpdateTopic
         );
 
-        $dataFromResponse = $response->getData();
-
-        $this->assertEquals(
-            $dataToUpdateTopic['name'],
-            $dataFromResponse->name
-        );
+        $this->assertTrue($this->examTest->examable->topics->contains('name', $dataToUpdateTopic['name']));
     }
 
     /**
@@ -132,21 +126,25 @@ class TopicControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
-        $user = User::factory()->create();
+        $user = $this->createModelFromFactory(new User);
 
-        $subject = Subject::factory()->create([
-            'user_id' => $this->user->id
+        $subject = $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user
         ]);
 
-        $examTest = Exam::factory()->create(
+        $examTest = $this->createModelFromFactory(
+            new Exam,
             [
                 'subject_id' => $this->subject->id
             ]
         );
 
-        $topic = Topic::factory()->create([
-            'test_id' => $this->examTest->examable_id
-        ]);
+        $topic = $this->createModelFromFactory(
+            new Topic,
+            [
+                'test_id' => $this->examTest->examable_id
+            ]
+        );
 
         $response = $this->deleteJson(
             route(

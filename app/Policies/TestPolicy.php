@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Examables\Test;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -45,9 +46,9 @@ class TestPolicy extends BasePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, Subject $subject)
     {
-        //
+        return $this->userCanCreateThisModel($user, $subject->user_id);
     }
 
     /**
@@ -119,6 +120,19 @@ class TestPolicy extends BasePolicy
             $userId,
             'create'
         );
+    }
+
+    /**
+     * Determine whether the user can get any topic from Test.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Examables\Test  $test
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function getAnyTopic(User $user, Test $test)
+    {
+        $userId = $this->getUserIdFromTest($test);
+        return  $this->userCanViewThisModel($user, $userId);
     }
 
     private function getUserIdFromTest($test): string

@@ -7,9 +7,14 @@ use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
-class SubjectPolicy
+class SubjectPolicy extends BasePolicy
 {
     use HandlesAuthorization;
+
+    public function __construct()
+    {
+        $this->recordName = 'Subject';
+    }
 
     /**
      * Determine whether the user can view any models.
@@ -32,13 +37,7 @@ class SubjectPolicy
     public function view(User $user, Subject $subject)
     {
 
-        $userCanViewSubject = ($user->id === $subject->user_id) ?
-
-            Response::allow() : Response::deny(__('policies.user_cannot_view', [
-                'record' => 'Subject'
-            ]));
-
-        return $userCanViewSubject;
+        return $this->userCanViewThisModel($user, $subject->user_id);
     }
 
     /**
@@ -62,13 +61,7 @@ class SubjectPolicy
     public function update(User $user, Subject $subject)
     {
 
-        $userCanUpdateSubject = ($user->id === $subject->user_id) ?
-
-            Response::allow() : Response::deny(__('policies.user_cannot_update', [
-                'record' => 'Subject'
-            ]));
-
-        return $userCanUpdateSubject;
+        return $this->userCanUpdateThisModel($user, $subject->user_id);
     }
 
     /**
@@ -80,13 +73,7 @@ class SubjectPolicy
      */
     public function delete(User $user, Subject $subject)
     {
-        $userCanDeleteSubject = ($user->id === $subject->user_id) ?
-
-            Response::allow() : Response::deny(__('policies.user_cannot_delete', [
-                'record' => 'Subject'
-            ]));
-
-        return $userCanDeleteSubject;
+        return $this->userCanDeleteThisModel($user, $subject->user_id);
     }
 
     /**
@@ -111,5 +98,17 @@ class SubjectPolicy
     public function forceDelete(User $user, Subject $subject)
     {
         //
+    }
+
+    /**
+     * Determine whether the user can create models.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function createAExam(User $user, Subject $subject)
+    {
+        $this->recordName = 'Test';
+        return $this->userCanCreateThisModel($user, $subject->user_id);
     }
 }

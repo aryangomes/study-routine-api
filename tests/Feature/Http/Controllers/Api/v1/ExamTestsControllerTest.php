@@ -7,6 +7,7 @@ use App\Models\Subject;
 use App\Models\Examables\Test;
 use App\Models\Topic;
 use App\Models\User;
+use App\Traits\CreateAModelFromFactory;
 use App\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class ExamTestsControllerTest extends TestCase
 {
-    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute;
+    use  RefreshDatabase, WithFaker, UserCanAccessThisRoute, CreateAModelFromFactory;
 
     private User $user;
     private Subject $subject;
@@ -35,13 +36,14 @@ class ExamTestsControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = $this->createModelFromFactory(new User);
 
-        $this->subject = Subject::factory()->create([
-            'user_id' => $this->user->id
+        $this->subject = $this->createModelFromFactory(new Subject, [
+            'user_id' => $this->user
         ]);
 
-        $this->examTest = Exam::factory()->create(
+        $this->examTest = $this->createModelFromFactory(
+            new Exam,
             [
                 'subject_id' => $this->subject->id
             ]
@@ -325,7 +327,6 @@ class ExamTestsControllerTest extends TestCase
     public function routesResourceWithAuthentication(): array
     {
         $this->setModelName('test');
-
         return $this->makeRoutesResourceWithAuthentication();
     }
 }

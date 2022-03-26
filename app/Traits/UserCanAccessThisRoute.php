@@ -13,7 +13,6 @@ use Laravel\Sanctum\Sanctum;
 trait UserCanAccessThisRoute
 {
     private string $modelName;
-
     private Model $model;
 
     /**
@@ -53,6 +52,16 @@ trait UserCanAccessThisRoute
         );
         $response->assertUnauthorized();
     }
+
+    public function routesResourceWithAuthentication(): array
+    {
+        return [];
+    }
+    public function routesResourceWithPolicies(): array
+    {
+        return [];
+    }
+
 
     protected function makeRoutesResourceWithAuthentication(): array
     {
