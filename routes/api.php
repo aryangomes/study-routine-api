@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\v1\Auth\LoginController;
-use App\Http\Controllers\Api\v1\Auth\LogoutController;
-use App\Http\Controllers\Api\v1\Auth\RegisterUserController;
-use App\Http\Controllers\Api\v1\ExamTest\AddNewTopicController;
-use App\Http\Controllers\Api\v1\ExamTest\GetTopicsController;
-use App\Http\Controllers\Api\v1\ExamTestsController;
-use App\Http\Controllers\Api\v1\SubjectController;
-use App\Http\Controllers\Api\v1\UserController;
+use App\Application\Api\Controllers\v1\Authentication\LoginController;
+use App\Application\Api\Controllers\v1\Authentication\LogoutController;
+use App\Application\Api\Controllers\v1\Authentication\RegisterUserController;
+use App\Application\Api\Controllers\v1\ExamTest\AddNewTopicController;
+use App\Application\Api\Controllers\v1\ExamTest\GetTopicsController;
+use App\Application\Api\Controllers\v1\ExamTestsController;
+use App\Application\Api\Controllers\v1\SubjectController;
+use App\Application\Api\Controllers\v1\TopicController;
+use App\Application\Api\Controllers\v1\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\v1\TopicController;
 
 /*
 |--------------------------------------------------------------------------

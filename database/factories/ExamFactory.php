@@ -2,8 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Subject;
-use App\Models\Examables\Test;
+use Domain\Exam\Models\Exam;
+use Domain\Subject\Models\Subject;
+use Domain\Examables\Test\Models\Test;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\WithFaker;
 
@@ -11,6 +12,12 @@ class ExamFactory extends Factory
 {
 
     use WithFaker;
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Exam::class;
 
     /**
      * Define the model's default state.

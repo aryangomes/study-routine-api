@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
-use App\Models\Exam;
-use App\Models\Subject;
-use App\Models\Topic;
-use App\Models\User;
-use App\Traits\CreateAModelFromFactory;
-use App\Traits\UserCanAccessThisRoute;
+use Domain\Exam\Models\Exam;
+use Domain\Subject\Models\Subject;
+use Domain\Examables\Test\Topic\Models\Topic;
+use Domain\User\Models\User;
+use App\Support\Traits\CreateAModelFromFactory;
+use App\Support\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;

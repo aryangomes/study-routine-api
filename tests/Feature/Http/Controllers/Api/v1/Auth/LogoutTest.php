@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\v1\Auth;
 
-use App\Models\User;
+use Domain\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
