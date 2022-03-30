@@ -15,7 +15,7 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->userService = new UserService(new User());
+        $this->userService = new UserService();
     }
 
     /**
@@ -52,9 +52,15 @@ class UserController extends Controller
 
         $validatedData = $request->validated();
 
+        $validatedDataExceptUserAvatar = collect($validatedData)->except('user_avatar')->toArray();
+
+        $userAvatarImage = $request->file('user_avatar');
+
         $userLogged = $this->getUserFromAuthUser();
 
-        $this->userService->update($userLogged, $validatedData);
+        $this->userService->update($userLogged, $validatedDataExceptUserAvatar);
+
+        $this->userService->uploadUserAvatar($userLogged, $userAvatarImage);
 
         return response()->json(new UserResource($userLogged));
     }

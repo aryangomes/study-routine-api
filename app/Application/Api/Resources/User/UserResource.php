@@ -3,6 +3,7 @@
 namespace App\Application\Api\Resources\User;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
-            'user_avatar_path' => $this->user_avatar_path,
+            'user_avatar_path' => Storage::url($this->user_avatar_path),
         ];
     }
 }

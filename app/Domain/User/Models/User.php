@@ -28,6 +28,11 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, Uuid;
 
     /**
+     * @property-read string DEFAULT_USER_AVATAR
+     */
+    public const DEFAULT_USER_AVATAR = 'default_user_avatar.png';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -79,6 +84,15 @@ class User extends Authenticatable
     {
 
         $this->attributes['password'] = bcrypt($password);
+    }
+
+
+    /**
+     * Get the value of user_avatar_path
+     */
+    public function getUserAvatarPathAttribute()
+    {
+        return $this->attributes['user_avatar_path'] ??             self::DEFAULT_USER_AVATAR;
     }
 
     /**
