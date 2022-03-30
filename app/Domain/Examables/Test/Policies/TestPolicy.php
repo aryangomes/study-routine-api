@@ -2,10 +2,10 @@
 
 namespace Domain\Examables\Test\Policies;
 
-use Domain\Examables\Test\Models\Test;
 use Domain\Subject\Models\Subject;
 use Domain\User\Models\User;
 use App\Support\Policies\BasePolicy;
+use Domain\Examables\Test\Models\Test;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TestPolicy extends BasePolicy
@@ -32,7 +32,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can view the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function view(User $user, Test $test)
@@ -56,7 +56,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can update the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function update(User $user, Test $test)
@@ -69,7 +69,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can delete the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function delete(User $user, Test $test)
@@ -82,7 +82,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can restore the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function restore(User $user, Test $test)
@@ -94,7 +94,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function forceDelete(User $user, Test $test)
@@ -106,7 +106,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can add a new topic to test.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test $test
+     * @param  \Domain\Examables\Test\Models\Test $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function addNewTopic(User $user, Test $test)
@@ -127,7 +127,7 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can get any topic from Test.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test  $test
+     * @param  \Domain\Examables\Test\Models\Test  $test
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function getAnyTopic(User $user, Test $test)

@@ -68,7 +68,7 @@ class Exam extends Model
      * Get "examable" model
      * 
      * A examble model can be a
-     *  - App\Models\Examables\Test
+     *  - Domain\Examables\Test\Models\Test
      *
      * @return MorphTo
      */

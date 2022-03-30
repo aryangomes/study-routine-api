@@ -47,6 +47,7 @@ class UpdateUserRequest extends FormRequest
             ],
             'password' => ['sometimes', 'string', 'confirmed'],
             'password_confirmation' => ['string', 'required_with:password'],
+            'user_avatar' => ['sometimes', 'image', 'max:' . ('3' * 1024)]
         ];
     }
 }

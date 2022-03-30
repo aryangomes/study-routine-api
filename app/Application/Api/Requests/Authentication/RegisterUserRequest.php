@@ -29,6 +29,7 @@ class RegisterUserRequest extends FormRequest
             'email' => ['email', 'required', 'unique:users'],
             'password' => ['string', 'required', 'confirmed'],
             'password_confirmation' => ['string', 'required_with:password'],
+            'user_avatar' => ['image', 'max:' . ('3' * 1024)]
         ];
     }
 }

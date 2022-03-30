@@ -27,7 +27,9 @@ class RegisterUserController extends Controller
     {
         $validatedData = $request->validated();
 
-        $this->registerUserService->registerUser($validatedData);
+        $userAvatarImage = $request->file('user_avatar');
+
+        $this->registerUserService->registerNewUser($validatedData, $userAvatarImage);
 
         $userLogged = $this->loginRegisteredUser($validatedData);
 

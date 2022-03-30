@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Api\v1;
+namespace Tests\Feature\Http\Controllers\Api\v1\User;
 
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
