@@ -37,11 +37,11 @@ class UploadUserAvatarTest extends TestCase
 
         $dataFromResponse = $response->getData();
 
-        $pathToAssertUserAvatarIamge = str_replace('storage', 'public', $dataFromResponse->user_avatar_path);
+        $pathToAssertUserAvatarImage = str_replace('storage', 'public', $dataFromResponse->user_avatar_path);
 
         $response->assertCreated();
 
-        Storage::disk('local')->assertExists($pathToAssertUserAvatarIamge);
+        Storage::disk('local')->assertExists($pathToAssertUserAvatarImage);
 
         return $dataFromResponse;
     }

@@ -48,7 +48,7 @@ class AddNewTopicControllerTest extends TestCase
         );
 
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
     /**
@@ -132,6 +132,42 @@ class AddNewTopicControllerTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    /**
+     * @test
+     */
+    public function user_cannot_perform_this_action_because_it_is_not_verified()
+    {
+        $user = User::factory()->unverified()->create();
+        Sanctum::actingAs($user);
+
+
+        $subject = Subject::factory()->create([
+            'user_id' => $user->id
+        ]);
+
+        $examTest = Exam::factory()->create(
+            [
+                'subject_id' => $subject->id
+            ]
+        );
+
+        $dataToCreateTopic = Topic::factory()->make(
+            [
+                'test_id' => $this->examTest->examable_id
+            ]
+        )->toArray();
+
+        $response = $this->postJson(
+            route(
+                'tests.add_new_topic',
+                ['test' => $examTest]
+            )
+        );
+
+        $response->assertStatus(403);
+    }
+
 
     // DATA PROVIDERS
 

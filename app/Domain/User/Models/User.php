@@ -23,7 +23,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $password
  * @property string $user_avatar_path
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, Uuid;
 
@@ -63,6 +63,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
 
     /**
      * Create a new factory instance for the model.

@@ -32,7 +32,7 @@ class SubjectControllerTest extends TestCase
 
         $this->initializeModelAndModelName('subject', $this->subject);
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
     //TESTS
@@ -241,7 +241,6 @@ class SubjectControllerTest extends TestCase
     {
 
         return [
-
             'New name is not string' => [
                 ['name' => $this->faker(Subject::class)->randomDigit()], 'name'
             ],
@@ -252,9 +251,6 @@ class SubjectControllerTest extends TestCase
             'New name is longer than 150 characters' => [
                 ['name' => Str::random(151)], 'name'
             ],
-
-
-
         ];
     }
 
@@ -270,10 +266,20 @@ class SubjectControllerTest extends TestCase
         $this->setModelName('subject');
 
         return [
-
             "User cannot view {$this->modelName} because is not authenticated" => ["{$this->modelName}s.show", 'get'],
             "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
             "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
+        ];
+    }
+
+    public function routesResourceWithEmailVerified(): array
+    {
+        $this->setModelName('subject');
+
+        return [
+            "User cannot view {$this->modelName} because is not verified" => ["{$this->modelName}s.show", 'get'],
+            "User cannot update {$this->modelName} because is not verified" => ["{$this->modelName}s.update", 'patch'],
+            "User cannot delete {$this->modelName} because is not verified" => ["{$this->modelName}s.destroy", 'delete'],
         ];
     }
 }

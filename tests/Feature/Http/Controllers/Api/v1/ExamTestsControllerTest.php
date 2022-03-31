@@ -52,7 +52,7 @@ class ExamTestsControllerTest extends TestCase
         $this->initializeModelAndModelName('test', $this->examTest);
 
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
     // TESTS
@@ -317,7 +317,6 @@ class ExamTestsControllerTest extends TestCase
         $this->setModelName('test');
 
         return [
-
             "User cannot view {$this->modelName}" => ["{$this->modelName}s.show", 'get'],
             "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
             "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
@@ -328,5 +327,11 @@ class ExamTestsControllerTest extends TestCase
     {
         $this->setModelName('test');
         return $this->makeRoutesResourceWithAuthentication();
+    }
+
+    public function routesResourceWithEmailVerified(): array
+    {
+        $this->setModelName('test');
+        return $this->makeRoutesResourceWithEmailVerified();
     }
 }

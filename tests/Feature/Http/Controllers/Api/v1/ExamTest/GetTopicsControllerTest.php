@@ -47,7 +47,7 @@ class GetTopicsControllerTest extends TestCase
             ]
         );
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
     /**
@@ -80,6 +80,23 @@ class GetTopicsControllerTest extends TestCase
     public function user_cannot_perform_this_action_because_it_is_unauthorized()
     {
         Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson(
+            route(
+                'tests.get_topics',
+                ['test' => $this->topic]
+            )
+        );
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function user_cannot_perform_this_action_because_it_is_not_verified()
+    {
+        Sanctum::actingAs(User::factory()->unverified()->create());
 
         $response = $this->getJson(
             route(

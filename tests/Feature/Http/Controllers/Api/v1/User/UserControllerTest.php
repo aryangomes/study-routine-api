@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1\User;
 
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
+use App\Support\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -22,7 +23,7 @@ class UserControllerTest extends TestCase
 
         $this->user = $this->createModelFromFactory(new User);
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
 
@@ -109,20 +110,18 @@ class UserControllerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider userRoutesResource
+     * @dataProvider routesResourceWithAuthentication
      */
     public function user_cannot_access_route_because_its_unauthenticated($route, $method)
     {
         $methodJson = $method . "Json";
 
         $response = $this->$methodJson(
-            route(
-                $route
-            )
+            route($route)
         );
+
         $response->assertUnauthorized();
     }
-
 
 
     public function validatedDataToUpdateUser(): array
@@ -136,6 +135,8 @@ class UserControllerTest extends TestCase
 
         ];
     }
+
+
 
     public function invalidatedDataToUpdateUser(): array
     {
@@ -188,6 +189,36 @@ class UserControllerTest extends TestCase
             'Show user' => ['users.show', 'get'],
             'Update user' => ['users.update', 'patch'],
             'Delete user' => ['users.destroy', 'delete'],
+        ];
+    }
+
+    public function routesResourceWithEmailVerified(): array
+    {
+        $modelName = 'user';
+        return  [
+            "User cannot view {$modelName} because is not verified" => ["{$modelName}s.show", 'get'],
+            "User cannot update {$modelName} because is not verified" => ["{$modelName}s.update", 'patch'],
+            "User cannot delete {$modelName} because is not verified" => ["{$modelName}s.destroy", 'delete'],
+        ];
+    }
+
+    public function routesResourceWithAuthentication(): array
+    {
+        $modelName = 'user';
+        return [
+            "User cannot view {$modelName} because is not authenticated" => ["{$modelName}s.show", 'get'],
+            "User cannot update {$modelName} because is not authenticated" => ["{$modelName}s.update", 'patch'],
+            "User cannot delete {$modelName} because is not authenticated" => ["{$modelName}s.destroy", 'delete'],
+        ];
+    }
+
+    public function routesResourceWithPolicies(): array
+    {
+        $modelName = 'user';
+        return [
+            "User cannot view {$modelName}" => ["{$modelName}s.show", 'get'],
+            "User cannot update {$modelName}" => ["{$modelName}s.update", 'patch'],
+            "User cannot delete {$modelName}" => ["{$modelName}s.destroy", 'delete'],
         ];
     }
 }

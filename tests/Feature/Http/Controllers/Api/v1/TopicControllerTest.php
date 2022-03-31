@@ -50,7 +50,7 @@ class TopicControllerTest extends TestCase
 
         $this->initializeModelAndModelName('topic', $this->topic);
 
-        $this->withMiddleware('auth:sanctum');
+        $this->withMiddleware(['auth:sanctum', 'verified']);
     }
 
     //TESTS
@@ -179,8 +179,6 @@ class TopicControllerTest extends TestCase
         $this->setModelName('topic');
 
         return [
-
-
             "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
             "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
         ];
@@ -191,9 +189,18 @@ class TopicControllerTest extends TestCase
         $this->setModelName('topic');
 
         return [
-
             "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
             "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
+        ];
+    }
+
+    public function routesResourceWithEmailVerified(): array
+    {
+        $this->setModelName('topic');
+
+        return [
+            "User cannot update {$this->modelName} because is not verified" => ["{$this->modelName}s.update", 'patch'],
+            "User cannot delete {$this->modelName} because is not verified" => ["{$this->modelName}s.destroy", 'delete'],
         ];
     }
 }
