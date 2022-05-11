@@ -2,6 +2,7 @@
 
 namespace Domain\Exam\Models;
 
+use Carbon\Carbon;
 use Database\Factories\ExamFactory;
 use DateTime;
 use Domain\Subject\Models\Subject;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Exam
@@ -20,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Exam extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -75,5 +77,16 @@ class Exam extends Model
     public function examable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Scope a query to only include effective date
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOneWeekToEffectiveDate($query)
+    {
+        return $query->where('effective_date', Carbon::today()->addWeek());
     }
 }
