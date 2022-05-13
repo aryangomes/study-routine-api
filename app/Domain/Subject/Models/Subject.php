@@ -3,6 +3,7 @@
 namespace Domain\Subject\Models;
 
 use Database\Factories\SubjectFactory;
+use Domain\Exam\Models\Exam;
 use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Class Subject
  * 
- * @property int $ids
+ * @property int $id
  * @property string $name 
  * @property int $user_id 
  */

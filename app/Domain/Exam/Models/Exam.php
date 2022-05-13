@@ -22,7 +22,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class Exam extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
