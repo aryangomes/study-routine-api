@@ -2,13 +2,14 @@
 
 namespace App\Domain\Exam\Notifications;
 
+use App\Domain\Exam\Mail\NearbyEffectiveDate as MailNearbyEffectiveDate;
 use Domain\Exam\Models\Exam;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
-class NearbyEffectiveDate extends Notification
+class NearbyEffectiveDate extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -17,15 +18,10 @@ class NearbyEffectiveDate extends Notification
      *
      * @return void
      */
-    public function __construct(private Exam $exam)
+    public function __construct(public Exam $exam)
     {
         //
-        logger(
-            'NearbyEffectiveDate',
-            [
-                'exam' => $this->exam
-            ]
-        );
+
     }
 
     /**
@@ -36,21 +32,23 @@ class NearbyEffectiveDate extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     /**
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return Mailable
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->subject("Exam effective date warning")
-            ->greeting("Hello, {$this->exam->subject->user->name}!")
-            ->line("This is a notification about your Exam, that will be in {$this->exam->effective_date}")->line('Thank you for using our application!');
+
+        $subject =    $this->generateSubject();
+
+        return (new MailNearbyEffectiveDate($this->exam))
+            ->subject($subject)
+            ->to($notifiable->email);
     }
 
     /**
@@ -62,7 +60,35 @@ class NearbyEffectiveDate extends Notification
     public function toArray($notifiable)
     {
         return [
-            'exam_id' => $this->exam->id
+            'exam_id' => $this->exam->id,
+            'subject_id' => $this->exam->subject_id,
+            'user_id' => $this->exam->subject->user_id,
         ];
+    }
+
+    /**
+     * Get the database representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toDatabase($notifiable)
+    {
+        return [
+            'exam_id' => $this->exam->id,
+            'subject_id' => $this->exam->subject_id,
+            'user_id' => $this->exam->subject->user_id,
+        ];
+    }
+
+    private function generateSubject(): string
+    {
+        $examableClass = new $this->exam->examable_type;
+
+        $examableClassName = get_short_class_name($examableClass);
+
+        $subject = "Your Exam {$examableClassName} is coming";
+
+        return $subject;
     }
 }
