@@ -59,10 +59,11 @@ class NearbyEffectiveDate extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
+
         return [
-            'exam_id' => $this->exam->id,
-            'subject_id' => $this->exam->subject_id,
-            'user_id' => $this->exam->subject->user_id,
+            'subject_name' => $this->exam->subject->name,
+            'user_name' => $this->exam->subject->user->name,
+            'exam_effective_date' => $this->exam->effective_date,
         ];
     }
 
@@ -74,10 +75,11 @@ class NearbyEffectiveDate extends Notification implements ShouldQueue
      */
     public function toDatabase($notifiable)
     {
+
         return [
-            'exam_id' => $this->exam->id,
-            'subject_id' => $this->exam->subject_id,
-            'user_id' => $this->exam->subject->user_id,
+            'subject_name' => $this->exam->subject->name,
+            'user_name' => $this->exam->subject->user->name,
+            'exam_effective_date' => $this->exam->effective_date,
         ];
     }
 

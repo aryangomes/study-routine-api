@@ -93,9 +93,9 @@ class NearbyEffectiveDateTest extends TestCase
 
                     $databaseNotification = $notification->toDatabase($notification);
                     $this->assertEquals([
-                        'exam_id' => $user->subjects[0]->exams[0]->id,
-                        'subject_id' => $user->subjects[0]->id,
-                        'user_id' => $user->id,
+                        'exam_effective_date' => $user->subjects[0]->exams[0]->effective_date,
+                        'subject_name' => $user->subjects[0]->name,
+                        'user_name' => $user->name,
                     ], $databaseNotification);
 
                     return true;
