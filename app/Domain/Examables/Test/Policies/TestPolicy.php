@@ -7,6 +7,7 @@ use Domain\User\Models\User;
 use App\Support\Policies\BasePolicy;
 use Domain\Examables\Test\Models\Test;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Database\Eloquent\Model;
 
 class TestPolicy extends BasePolicy
 {
@@ -37,7 +38,7 @@ class TestPolicy extends BasePolicy
      */
     public function view(User $user, Test $test)
     {
-        $userId = $this->getUserIdFromTest($test);
+        $userId = $this->getUserIdFromModel($test);
         return  $this->userCanViewThisModel($user, $userId);
     }
 
@@ -61,7 +62,7 @@ class TestPolicy extends BasePolicy
      */
     public function update(User $user, Test $test)
     {
-        $userId = $this->getUserIdFromTest($test);
+        $userId = $this->getUserIdFromModel($test);
         return  $this->userCanUpdateThisModel($user, $userId);
     }
 
@@ -74,7 +75,7 @@ class TestPolicy extends BasePolicy
      */
     public function delete(User $user, Test $test)
     {
-        $userId = $this->getUserIdFromTest($test);
+        $userId = $this->getUserIdFromModel($test);
         return  $this->userCanDeleteThisModel($user, $userId);
     }
 
@@ -112,7 +113,7 @@ class TestPolicy extends BasePolicy
     public function addNewTopic(User $user, Test $test)
     {
 
-        $userId = $this->getUserIdFromTest($test);
+        $userId = $this->getUserIdFromModel($test);
 
         $this->recordName = 'Topic';
 
@@ -132,13 +133,20 @@ class TestPolicy extends BasePolicy
      */
     public function getAnyTopic(User $user, Test $test)
     {
-        $userId = $this->getUserIdFromTest($test);
+        $userId = $this->getUserIdFromModel($test);
         return  $this->userCanViewThisModel($user, $userId);
     }
 
-    private function getUserIdFromTest($test): string
+
+    /**
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *
+     * @return string
+     */
+    protected function getUserIdFromModel(Model $model): string
     {
-        $userId = $test->exam->subject->user_id;
+        $userId = $model->exam->subject->user_id;
         return $userId;
     }
 }

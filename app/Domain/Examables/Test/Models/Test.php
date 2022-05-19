@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @property int $exam_id
  * 
  */
-class Test extends Model
+class Test extends Exam
 {
     use HasFactory;
 
@@ -73,20 +73,5 @@ class Test extends Model
     public function exam(): MorphOne
     {
         return $this->morphOne(Exam::class, 'examable');
-    }
-
-    /**
-     * Scope a query to only include popular users.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeOfUser($query, User $user)
-    {
-        return $query
-            ->with('exam', 'exam.subject')
-            ->whereHas('exam.subject', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id);
-            });
     }
 }

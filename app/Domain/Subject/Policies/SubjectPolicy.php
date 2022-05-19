@@ -6,6 +6,7 @@ use Domain\Subject\Models\Subject;
 use App\Support\Policies\BasePolicy;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Database\Eloquent\Model;
 
 class SubjectPolicy extends BasePolicy
 {
@@ -61,7 +62,7 @@ class SubjectPolicy extends BasePolicy
     public function update(User $user, Subject $subject)
     {
 
-        return $this->userCanUpdateThisModel($user, $subject->user_id);
+        return $this->userCanUpdateThisModel($user, $this->getUserIdFromModel($subject));
     }
 
     /**
@@ -101,14 +102,26 @@ class SubjectPolicy extends BasePolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create a Exam.
      *
      * @param  \Domain\User\Models\User  $user
+     * @param  \Domain\Subject\Models\Subject $subject
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function createAExam(User $user, Subject $subject)
     {
-        $this->recordName = 'Test';
         return $this->userCanCreateThisModel($user, $subject->user_id);
+    }
+
+    /**
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *
+     * @return string
+     */
+    protected function getUserIdFromModel(Model $model): string
+    {
+        $userId = $model->user_id;
+        return $userId;
     }
 }

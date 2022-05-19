@@ -7,6 +7,7 @@ use Domain\Examables\Test\Models\Test;
 use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Database\Eloquent\Model;
 
 class TopicPolicy extends BasePolicy
 {
@@ -37,7 +38,7 @@ class TopicPolicy extends BasePolicy
      */
     public function view(User $user, Topic $topic)
     {
-        $userId = $this->getUserIdFromTopic($topic);
+        $userId = $this->getUserIdFromModel($topic);
         return $this->userCanViewThisModel($user, $userId);
     }
 
@@ -70,7 +71,7 @@ class TopicPolicy extends BasePolicy
      */
     public function update(User $user, Topic $topic)
     {
-        $userId = $this->getUserIdFromTopic($topic);
+        $userId = $this->getUserIdFromModel($topic);
         return $this->userCanUpdateThisModel($user, $userId);
     }
 
@@ -84,7 +85,7 @@ class TopicPolicy extends BasePolicy
     public function delete(User $user, Topic $topic)
     {
 
-        $userId = $this->getUserIdFromTopic($topic);
+        $userId = $this->getUserIdFromModel($topic);
         return $this->userCanDeleteThisModel($user, $userId);
     }
 
@@ -112,9 +113,15 @@ class TopicPolicy extends BasePolicy
         //
     }
 
-    private function getUserIdFromTopic($topic): string
+    /**
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *
+     * @return string
+     */
+    protected function getUserIdFromModel(Model $model): string
     {
-        $userId = $topic->test->exam->subject->user_id;
+        $userId = $model->test->exam->subject->user_id;
         return $userId;
     }
 }

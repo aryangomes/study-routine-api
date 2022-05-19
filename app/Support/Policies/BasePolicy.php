@@ -5,7 +5,7 @@ namespace App\Support\Policies;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
-
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Base Class of Policies
@@ -16,6 +16,8 @@ abstract class BasePolicy
 {
     use HandlesAuthorization;
     protected $recordName = 'record';
+
+    abstract protected function getUserIdFromModel(Model $model): string;
 
     /**
      * Verify if the User can get any of a record
