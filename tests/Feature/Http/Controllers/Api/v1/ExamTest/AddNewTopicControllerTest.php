@@ -7,11 +7,12 @@ use Domain\Subject\Models\Subject;
 use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Domain\Examables\Test\Models\Test;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class AddNewTopicControllerTest extends TestCase
 {
@@ -33,17 +34,17 @@ class AddNewTopicControllerTest extends TestCase
             'user_id' => $this->user
         ]);
 
-        $this->examTest = $this->createModelFromFactory(
-            new Exam,
-            [
-                'subject_id' => $this->subject->id
-            ]
-        );
+        $this->examTest = Test::factory()->create();
+
+        $this->exam = Exam::factory()->test()->create([
+            'subject_id' => $this->subject,
+            'examable_id' =>    $this->examTest->id,
+        ]);
 
         $this->topic = $this->createModelFromFactory(
             new Topic,
             [
-                'test_id' => $this->examTest->examable_id
+                'test_id' => $this->examTest->id
             ]
         );
 
@@ -63,14 +64,14 @@ class AddNewTopicControllerTest extends TestCase
 
         $response = $this->postJson(
             route('tests.add_new_topic', [
-                'test' => $this->examTest->examable_id
+                'test' => $this->examTest->id
             ]),
             $dataToCreateTopic
         );
 
         $response->assertCreated();
 
-        $this->assertTrue($this->examTest->examable->topics->contains('name', $dataToCreateTopic['name']));
+        $this->assertTrue($this->examTest->topics->contains('name', $dataToCreateTopic['name']));
     }
 
     /**
@@ -86,7 +87,7 @@ class AddNewTopicControllerTest extends TestCase
         $response = $this->postJson(
             route(
                 'tests.add_new_topic',
-                ['test' => $this->examTest->examable_id]
+                ['test' => $this->examTest->id]
             ),
             $invalidatedDataToCreateTopic
         );
@@ -110,15 +111,18 @@ class AddNewTopicControllerTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $examTest = Exam::factory()->create(
+        $examTest = Test::factory()->create();
+
+        $exam = Exam::factory()->test()->create(
             [
-                'subject_id' => $subject->id
+                'subject_id' => $subject->id,
+                'examable_id' => $examTest->id,
             ]
         );
 
         $dataToCreateTopic = Topic::factory()->make(
             [
-                'test_id' => $this->examTest->examable_id
+                'test_id' => $examTest->id
             ]
         )->toArray();
 
@@ -146,7 +150,7 @@ class AddNewTopicControllerTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $examTest = Exam::factory()->create(
+        $examTest = Exam::factory()->test()->create(
             [
                 'subject_id' => $subject->id
             ]
@@ -154,7 +158,7 @@ class AddNewTopicControllerTest extends TestCase
 
         $dataToCreateTopic = Topic::factory()->make(
             [
-                'test_id' => $this->examTest->examable_id
+                'test_id' => $this->examTest->id
             ]
         )->toArray();
 

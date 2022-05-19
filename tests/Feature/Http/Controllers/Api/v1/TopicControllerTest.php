@@ -8,8 +8,10 @@ use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
 use App\Support\Traits\UserCanAccessThisRoute;
+use Domain\Examables\Test\Models\Test;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -34,17 +36,17 @@ class TopicControllerTest extends TestCase
             'user_id' => $this->user
         ]);
 
-        $this->examTest = $this->createModelFromFactory(
-            new Exam,
-            [
-                'subject_id' => $this->subject->id
-            ]
-        );
+        $this->examTest = Test::factory()->create();
+
+        $this->exam = Exam::factory()->test()->create([
+            'subject_id' => $this->subject,
+            'examable_id' =>    $this->examTest->id,
+        ]);
 
         $this->topic = $this->createModelFromFactory(
             new Topic,
             [
-                'test_id' => $this->examTest->examable_id
+                'test_id' => $this->examTest->id
             ]
         );
 
@@ -77,7 +79,7 @@ class TopicControllerTest extends TestCase
             $dataToUpdateTopic
         );
 
-        $this->assertTrue($this->examTest->examable->topics->contains('name', $dataToUpdateTopic['name']));
+        $this->assertTrue($this->examTest->topics->contains('name', $dataToUpdateTopic['name']));
     }
 
     /**
@@ -176,31 +178,27 @@ class TopicControllerTest extends TestCase
 
     protected function routesResourceWithAuthentication(): array
     {
-        $this->setModelName('topic');
+        $routesResourceWithAuthentication
+            = $this->makeRoutesResourceWithAuthentication('Topic', 'topics');
+        $routesResourceWithPolicies = Arr::only($routesResourceWithAuthentication, [array_keys($routesResourceWithAuthentication)[2], array_keys($routesResourceWithAuthentication)[3]]);
 
-        return [
-            "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        return $routesResourceWithAuthentication;
     }
 
     protected function routesResourceWithPolicies(): array
     {
-        $this->setModelName('topic');
-
-        return [
-            "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        $routesResourceWithPolicies
+            = $this->makeRoutesResourceWithPolicies('Topic', 'topics');
+        $routesResourceWithPolicies = Arr::only($routesResourceWithPolicies, [array_keys($routesResourceWithPolicies)[2], array_keys($routesResourceWithPolicies)[3]]);
+        return $routesResourceWithPolicies;
     }
 
     public function routesResourceWithEmailVerified(): array
     {
-        $this->setModelName('topic');
+        $routesResourceWithEmailVerified
+            = $this->makeRoutesResourceWithEmailVerified('Topic', 'topics');
+        $routesResourceWithEmailVerified = Arr::only($routesResourceWithEmailVerified, [array_keys($routesResourceWithEmailVerified)[2], array_keys($routesResourceWithEmailVerified)[3]]);
 
-        return [
-            "User cannot update {$this->modelName} because is not verified" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not verified" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        return $routesResourceWithEmailVerified;
     }
 }

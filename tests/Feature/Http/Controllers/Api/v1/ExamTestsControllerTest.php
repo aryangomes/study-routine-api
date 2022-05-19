@@ -11,6 +11,7 @@ use App\Support\Traits\CreateAModelFromFactory;
 use App\Support\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -42,12 +43,13 @@ class ExamTestsControllerTest extends TestCase
             'user_id' => $this->user
         ]);
 
-        $this->examTest = $this->createModelFromFactory(
-            new Exam,
-            [
-                'subject_id' => $this->subject->id
-            ]
-        );
+        $this->examTest = Test::factory()->create();
+
+        $this->exam = Exam::factory()->test()->create([
+            'subject_id' => $this->subject,
+            'examable_id' =>    $this->examTest->id,
+        ]);
+
 
         $this->initializeModelAndModelName('test', $this->examTest);
 
@@ -112,7 +114,7 @@ class ExamTestsControllerTest extends TestCase
         $response = $this->getJson(
             route(
                 'tests.show',
-                ['test' => $this->examTest->examable]
+                ['test' => $this->examTest]
             )
         );
         $dataFromResponse = $response->getData();
@@ -136,7 +138,7 @@ class ExamTestsControllerTest extends TestCase
                 ]);
                 $examTestsUser = Exam::factory()->count(
                     $this->faker()->randomDigitNotZero()
-                )->create([
+                )->test()->create([
                     'subject_id' => $subject->id
                 ]);
 
@@ -149,19 +151,6 @@ class ExamTestsControllerTest extends TestCase
                 });
             }
         );
-        $examTests = Exam::factory()->count(
-            $this->faker()->randomDigitNotZero()
-        )->create([
-            'subject_id' => $this->subject->id
-        ]);
-
-        $examTests->each(function ($exam) {
-            (Topic::factory()
-                ->count($this->faker()->randomDigitNotZero())
-                ->create([
-                    'test_id' => $exam->examable_id
-                ]));
-        });
 
         $response = $this->getJson(
             route(
@@ -190,7 +179,7 @@ class ExamTestsControllerTest extends TestCase
         $response = $this->patchJson(
             route('tests.update', [
                 'test' =>
-                $this->examTest->examable
+                $this->examTest
             ]),
             $dataToUpdateTest
         );
@@ -212,7 +201,7 @@ class ExamTestsControllerTest extends TestCase
 
         $response = $this->patchJson(
             route('tests.update', [
-                'test' => $this->examTest->examable
+                'test' => $this->examTest
             ]),
             $invalidatedDataToUpdateExamTest
         );
@@ -230,14 +219,14 @@ class ExamTestsControllerTest extends TestCase
         $response = $this->deleteJson(
             route(
                 'tests.destroy',
-                ['test' => $this->examTest->examable]
+                ['test' => $this->examTest]
             )
         );
 
         $response->assertNoContent();
 
         $this->assertDeleted('exams', $this->examTest->toArray());
-        $this->assertDeleted('tests', $this->examTest->examable->toArray());
+        $this->assertDeleted('tests', $this->examTest->toArray());
     }
 
 
@@ -314,24 +303,23 @@ class ExamTestsControllerTest extends TestCase
 
     public function routesResourceWithPolicies(): array
     {
-        $this->setModelName('test');
 
-        return [
-            "User cannot view {$this->modelName}" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        $routesResourceWithPolicies
+            = $this->makeRoutesResourceWithPolicies('Exam Test', 'tests');
+        $routesResourceWithPolicies = Arr::except($routesResourceWithPolicies, [array_keys($routesResourceWithPolicies)[0]]);
+
+        return $routesResourceWithPolicies;
     }
 
     public function routesResourceWithAuthentication(): array
     {
-        $this->setModelName('test');
-        return $this->makeRoutesResourceWithAuthentication();
+
+        return $this->makeRoutesResourceWithAuthentication('Test', 'tests');
     }
 
     public function routesResourceWithEmailVerified(): array
     {
-        $this->setModelName('test');
-        return $this->makeRoutesResourceWithEmailVerified();
+
+        return $this->makeRoutesResourceWithEmailVerified('Test', 'tests');
     }
 }

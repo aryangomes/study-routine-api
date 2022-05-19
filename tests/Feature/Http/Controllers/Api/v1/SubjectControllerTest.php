@@ -8,6 +8,7 @@ use App\Support\Traits\CreateAModelFromFactory;
 use App\Support\Traits\UserCanAccessThisRoute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -256,30 +257,25 @@ class SubjectControllerTest extends TestCase
 
     public function routesResourceWithAuthentication(): array
     {
-        $this->setModelName('subject');
 
-        return $this->makeRoutesResourceWithAuthentication();
+        return $this->makeRoutesResourceWithAuthentication('Subject', 'subjects');
     }
 
     public function routesResourceWithPolicies(): array
     {
-        $this->setModelName('subject');
+        $routesResourceWithPolicies
+            = $this->makeRoutesResourceWithPolicies('Subject', 'subjects');
+        $routesResourceWithPolicies = Arr::except($routesResourceWithPolicies, [array_keys($routesResourceWithPolicies)[0], array_keys($routesResourceWithPolicies)[1]]);
 
-        return [
-            "User cannot view {$this->modelName} because is not authenticated" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        return $routesResourceWithPolicies;
     }
 
     public function routesResourceWithEmailVerified(): array
     {
-        $this->setModelName('subject');
+        $routesResourceWithEmailVerified
+            = $this->makeRoutesResourceWithEmailVerified('Subject', 'subjects');
+        $routesResourceWithEmailVerified = Arr::except($routesResourceWithEmailVerified, [array_keys($routesResourceWithEmailVerified)[0], array_keys($routesResourceWithEmailVerified)[1]]);
 
-        return [
-            "User cannot view {$this->modelName} because is not verified" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName} because is not verified" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not verified" => ["{$this->modelName}s.destroy", 'delete'],
-        ];
+        return $routesResourceWithEmailVerified;
     }
 }

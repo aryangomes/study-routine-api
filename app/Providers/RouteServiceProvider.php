@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -43,6 +44,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
+
+            $this->mapGroupsWorkApiRoutes();
+
+
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
@@ -59,5 +64,14 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
         });
+    }
+
+    private function mapGroupsWorkApiRoutes()
+    {
+
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/group_work.php'));
     }
 }

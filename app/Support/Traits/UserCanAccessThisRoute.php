@@ -13,7 +13,10 @@ use Laravel\Sanctum\Sanctum;
 trait UserCanAccessThisRoute
 {
     private string $modelName;
+    private ?string $routeName = null;
     private Model $model;
+
+
 
     /**
      * @test
@@ -31,7 +34,6 @@ trait UserCanAccessThisRoute
                 [$this->modelName => $this->model]
             )
         );
-
 
         $response->assertStatus(403);
     }
@@ -89,34 +91,34 @@ trait UserCanAccessThisRoute
     }
 
 
-    protected function makeRoutesResourceWithAuthentication(): array
+    protected function makeRoutesResourceWithAuthentication(string $modelName, string $routeName): array
     {
         return [
-            "User cannot view any {$this->modelName} because is not authenticated" => ["{$this->modelName}s.index", 'get'],
-            "User cannot view {$this->modelName} because is not authenticated" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName} because is not authenticated" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not authenticated" => ["{$this->modelName}s.destroy", 'delete'],
+            "User cannot view any {$modelName} because is not authenticated" => ["{$routeName}.index", 'get'],
+            "User cannot view {$modelName} because is not authenticated" => ["{$routeName}.show", 'get'],
+            "User cannot update {$modelName} because is not authenticated" => ["{$routeName}.update", 'patch'],
+            "User cannot delete {$modelName} because is not authenticated" => ["{$routeName}.destroy", 'delete'],
         ];
     }
 
-    protected function makeRoutesResourceWithEmailVerified(): array
+    protected function makeRoutesResourceWithEmailVerified(string $modelName, string $routeName): array
     {
         return [
-            "User cannot view any {$this->modelName} because is not verified" => ["{$this->modelName}s.index", 'get'],
-            "User cannot view {$this->modelName} because is not verified" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName} because is not verified" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName} because is not verified" => ["{$this->modelName}s.destroy", 'delete'],
+            "User cannot view any {$modelName} because is not verified" => ["{$routeName}.index", 'get'],
+            "User cannot view {$modelName} because is not verified" => ["{$routeName}.show", 'get'],
+            "User cannot update {$modelName} because is not verified" => ["{$routeName}.update", 'patch'],
+            "User cannot delete {$modelName} because is not verified" => ["{$routeName}.destroy", 'delete'],
         ];
     }
 
-    protected function makeRoutesResourceWithPolicies(): array
+    protected function makeRoutesResourceWithPolicies(string $modelName, string $routeName): array
     {
 
         return [
-            "User cannot view any {$this->modelName}" => ["{$this->modelName}s.index", 'get'],
-            "User cannot view {$this->modelName}" => ["{$this->modelName}s.show", 'get'],
-            "User cannot update {$this->modelName}" => ["{$this->modelName}s.update", 'patch'],
-            "User cannot delete {$this->modelName}" => ["{$this->modelName}s.destroy", 'delete'],
+            "User cannot view any {$modelName}" => ["{$routeName}.index", 'get'],
+            "User cannot view {$modelName}" => ["{$routeName}.show", 'get'],
+            "User cannot update {$modelName}" => ["{$routeName}.update", 'patch'],
+            "User cannot delete {$modelName}" => ["{$routeName}.destroy", 'delete'],
         ];
     }
 
@@ -145,5 +147,29 @@ trait UserCanAccessThisRoute
         $this->setModelName($modelName);
 
         $this->setModel($model);
+    }
+
+    /**
+     * Get the value of routeName
+     */
+    public function getRouteName()
+    {
+        if (is_null($this->routeName) && !is_null($this->modelName)) {
+            $this->routeName = "{$this->modelName}s";
+        }
+
+        return $this->routeName;
+    }
+
+    /**
+     * Set the value of routeName
+     *
+     * @return  self
+     */
+    public function setRouteName($routeName)
+    {
+        $this->routeName = $routeName;
+
+        return $this;
     }
 }

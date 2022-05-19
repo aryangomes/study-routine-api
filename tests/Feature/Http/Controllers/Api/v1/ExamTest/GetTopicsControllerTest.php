@@ -33,17 +33,17 @@ class GetTopicsControllerTest extends TestCase
             'user_id' => $this->user
         ]);
 
-        $this->examTest = $this->createModelFromFactory(
-            new Exam,
-            [
-                'subject_id' => $this->subject->id
-            ]
-        );
+        $this->examTest = Test::factory()->create();
+
+        $this->exam = Exam::factory()->test()->create([
+            'subject_id' => $this->subject,
+            'examable_id' =>    $this->examTest->id,
+        ]);
 
         $this->topic = $this->createModelFromFactory(
             new Topic,
             [
-                'test_id' => $this->examTest->examable_id
+                'test_id' => $this->examTest->id
             ]
         );
 
@@ -61,8 +61,7 @@ class GetTopicsControllerTest extends TestCase
         Topic::factory()
             ->count($this->faker()->randomDigitNotZero())
             ->create([
-                'test_id' =>
-                $this->examTest->examable_id
+                'test_id' => $this->examTest->id
             ]);
 
         $response = $this->getJson(

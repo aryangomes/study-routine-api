@@ -43,7 +43,7 @@ class Exam extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'effective_date' => 'datetime:Y-m-d H:m:i',
+        'effective_date' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**
@@ -72,6 +72,7 @@ class Exam extends Model
      * 
      * A examble model can be a
      *  - Domain\Examables\Test\Models\Test
+     *  - Domain\Examables\GroupWork\Models\GroupWork
      *
      * @return MorphTo
      */

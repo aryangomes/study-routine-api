@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
 use Domain\Examables\Test\Models\Test;
@@ -26,18 +27,48 @@ class ExamFactory extends Factory
      */
     public function definition()
     {
-        $examables = [
-            Test::class,
-        ];
-
-        $examableType = $this->faker->randomElement($examables);
-        $examable = $examableType::factory()->create();
 
         return [
-            'examable_id' => $examable->id,
-            'examable_type' => $examableType,
             'subject_id' => Subject::factory()->create(),
             'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
         ];
+    }
+
+    /**
+     * Indicate this exam is a test.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function test()
+    {
+        return $this->state(function (array $attributes) {
+
+            return [
+                'examable_type' => Test::class,
+                'examable_id' => Test::factory()->create(),
+                'subject_id' => Subject::factory()->create(),
+                'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
+
+            ];
+        });
+    }
+
+    /**
+     * Indicate this exam is a group work.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function groupWork()
+    {
+        return $this->state(function (array $attributes) {
+
+            return [
+                'examable_type' => GroupWork::class,
+                'examable_id' => GroupWork::factory()->create(),
+                'subject_id' => Subject::factory()->create(),
+                'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
+
+            ];
+        });
     }
 }

@@ -36,7 +36,7 @@ class NearbyEffectiveDateTest extends TestCase
         });
 
         $users->each(function ($user) {
-            Exam::factory()->create([
+            Exam::factory()->test()->create([
                 'subject_id' => $user->subjects[0]->id,
                 'effective_date' => Carbon::today()->addWeek()
             ]);
@@ -72,7 +72,7 @@ class NearbyEffectiveDateTest extends TestCase
         });
 
         $users->each(function ($user) {
-            Exam::factory()->create([
+            Exam::factory()->test()->create([
                 'subject_id' => $user->subjects[0]->id,
                 'effective_date' => Carbon::today()->addWeek()
             ]);
