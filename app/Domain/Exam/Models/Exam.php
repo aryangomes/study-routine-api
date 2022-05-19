@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Database\Factories\ExamFactory;
 use DateTime;
 use Domain\Subject\Models\Subject;
+use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,5 +89,20 @@ class Exam extends Model
     public function scopeOneWeekToEffectiveDate($query)
     {
         return $query->where('effective_date', Carbon::today()->addWeek());
+    }
+
+    /**
+     * Scope a query to only user's exams.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfUser($query, User $user)
+    {
+        return $query
+            ->with('exam', 'exam.subject')
+            ->whereHas('exam.subject', function ($query) use ($user) {
+                $query->where('user_id', '=', $user->id);
+            });
     }
 }
