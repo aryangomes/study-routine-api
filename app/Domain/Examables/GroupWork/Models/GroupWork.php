@@ -2,10 +2,9 @@
 
 namespace App\Domain\Examables\GroupWork\Models;
 
-use Database\Factories\GroupWorkFactory;
+use Database\Factories\Examables\GroupWorkFactory;
 use Domain\Exam\Models\Exam;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class GroupWork extends Exam

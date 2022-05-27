@@ -38,6 +38,7 @@ class GroupWorkController extends BaseApiController
      */
     public function store(StoreGroupWorkRequest $request)
     {
+
         $validatedData = $request->validated();
 
         $subject = Subject::find($validatedData['subject_id']);

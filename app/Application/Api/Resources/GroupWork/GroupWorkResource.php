@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Resources\GroupWork;
 
+use App\Application\Api\Resources\Exam\ExamResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GroupWorkResource extends JsonResource
@@ -16,8 +17,10 @@ class GroupWorkResource extends JsonResource
     {
         return [
             "id" => $this->id,
+            'exam' => new ExamResource($this->exam),
             "topic" => $this->topic,
-            "note" => $this->note
+            "note" => $this->note,
+
         ];
     }
 }

@@ -37,6 +37,7 @@ class GroupWorkPolicy extends BasePolicy
      */
     public function view(User $user, GroupWork $groupWork)
     {
+
         $userId = $this->getUserIdFromModel($groupWork);
         return  $this->userCanViewThisModel($user, $userId);
     }

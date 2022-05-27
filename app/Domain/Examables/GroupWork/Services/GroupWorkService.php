@@ -5,9 +5,12 @@ namespace App\Domain\Examables\GroupWork\Services;
 
 use App\Domain\Exam\Actions\CreateExam;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
+use App\Support\Actions\CrudModelOperations\Create;
 use App\Support\Services\CrudModelOperationsService;
+use Domain\Exam\Models\Exam;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class GroupWorkService extends CrudModelOperationsService
 {
@@ -39,22 +42,30 @@ class GroupWorkService extends CrudModelOperationsService
     **/
     public function create(array $dataToCreate): GroupWork
     {
-        $dataToCreateExam = Arr::only($dataToCreate, ['subject_id', 'effective_date']);
-        $dataToCreate = Arr::except($dataToCreate, ['subject_id', 'effective_date']);
 
-        $createAction = $this->createAction;
+        $dataToCreateGroupWork = Arr::only($dataToCreate, ['topic', 'note']);
 
-        $this->groupWork = $createAction($dataToCreate);
+        $createGroupWork = new Create(new GroupWork());
+        $this->groupWork = $createGroupWork($dataToCreateGroupWork);
 
+        $dataToCreateExam = Arr::only($dataToCreate, ['effective_date', 'subject_id']);
+        $dataToCreateExam = Arr::Add($dataToCreateExam, 'examable_type', GroupWork::class);
+        $dataToCreateExam = Arr::Add($dataToCreateExam, 'examable_id', $this->groupWork->id);
 
-        $dataToCreateExam = Arr::add($dataToCreateExam, 'examable_id', $this->groupWork->id);
-        $dataToCreateExam = Arr::add($dataToCreateExam, 'examable_type', $this->groupWork::class);
-
-        $createExamAction = new CreateExam();
-        $exam = $createExamAction($dataToCreateExam);
-
-
+        $createExam = new Create(new Exam());
+        $exam = $createExam($dataToCreateExam);
 
         return $this->groupWork;
+    }
+
+    public function update(Model $groupWork, array $dataToUpdate): Model
+    {
+        $updateAction  = $this->updateAction;
+
+        $updateAction($groupWork, $dataToUpdate);
+
+        $updateAction($groupWork->exam, $dataToUpdate);
+
+        return $groupWork;
     }
 }
