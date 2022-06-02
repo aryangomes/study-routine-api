@@ -4,6 +4,7 @@
 namespace App\Domain\Examables\GroupWork\Services;
 
 use App\Domain\Exam\Actions\CreateExam;
+use App\Domain\Examables\GroupWork\Member\Actions\AddMemberToGroupWork;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Support\Actions\CrudModelOperations\Create;
 use App\Support\Services\CrudModelOperationsService;
@@ -27,9 +28,9 @@ class GroupWorkService extends CrudModelOperationsService
      **/
     public function getAll(): Collection
     {
-        $user = auth()->user();
+        $authenticatedUser = auth()->user();
 
-        $getAll  = GroupWork::ofUser($user)->orderBy('created_at', 'desc')->get();
+        $getAll  = GroupWork::ofUser($authenticatedUser)->orderBy('created_at', 'desc')->get();
 
         return $getAll;
     }
@@ -54,6 +55,12 @@ class GroupWorkService extends CrudModelOperationsService
 
         $createExam = new Create(new Exam());
         $exam = $createExam($dataToCreateExam);
+
+        $addDefaultMemberGroupWork = new AddMemberToGroupWork($this->groupWork);
+
+        $authenticatedUser = auth()->user();
+
+        $addDefaultMemberGroupWork($authenticatedUser->getAuthIdentifier());
 
         return $this->groupWork;
     }
