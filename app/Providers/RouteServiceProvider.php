@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\Examables\GroupWork\Member\Models\Member;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -47,6 +48,8 @@ class RouteServiceProvider extends ServiceProvider
 
             $this->mapGroupsWorkApiRoutes();
 
+            $this->mapMembersGroupWorkApiRoutes();
+
 
             Route::middleware('web')
                 ->namespace($this->namespace)
@@ -73,5 +76,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/v1/group_work.php'));
+    }
+
+    private function mapMembersGroupWorkApiRoutes()
+    {
+
+        Route::prefix('api/v1/groupsWork/{groupWork}')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/members_group_work.php'));
     }
 }
