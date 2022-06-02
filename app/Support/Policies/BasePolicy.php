@@ -108,7 +108,7 @@ abstract class BasePolicy
     {
         $userCanDoThisActionWithThisModel =  ($user->id === $userId) ?
 
-            $this->allow() : $this->deny(__("policies.user_cannot_{$actionName}", [
+            $this->allow() : $this->deny(__("policies.user.user_cannot_{$actionName}", [
                 'record' => $this->recordName
             ]));
 
@@ -119,10 +119,25 @@ abstract class BasePolicy
     {
         $userIsTheAuthenticatedUser =  ($user->id === auth()->id()) ?
 
-            $this->allow() : $this->deny(__("policies.user_cannot_{$actionName}", [
+            $this->allow() : $this->deny(__("policies.user.user_cannot_{$actionName}", [
                 'record' => $this->recordName
             ]));
 
         return $userIsTheAuthenticatedUser;
+    }
+
+    /**
+     * Verify if user can do an action
+     * @param bool|callable $test
+     * @param string $messageDeny
+     * @return Response
+     */
+    protected function userCanDoThisAction(bool|callable $test, string $messageDeny = "This is action is forbidden."): Response
+    {
+        $userCanDoThisAction =  $test ?
+
+            $this->allow() : $this->deny($messageDeny);
+
+        return $userCanDoThisAction;
     }
 }

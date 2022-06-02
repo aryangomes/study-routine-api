@@ -2,11 +2,14 @@
 
 namespace Database\Seeders;
 
-use Domain\Subject\Models\Subject;
+use Domain\User\Models\User;
 use Illuminate\Database\Seeder;
 
-class SubjectSeeder extends Seeder
+class UserSeeder extends Seeder
 {
+
+
+
     /**
      * Run the database seeds.
      *
@@ -14,6 +17,6 @@ class SubjectSeeder extends Seeder
      */
     public function run()
     {
-        Subject::factory()->create();
+        User::factory()->create();
     }
 }

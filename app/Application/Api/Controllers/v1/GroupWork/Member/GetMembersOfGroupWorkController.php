@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Api\Controllers\v1\MemberGroupWork;
+namespace App\Application\Api\Controllers\v1\GroupWork\Member;
 
-use App\Application\Api\Controllers\v1\GroupWorkController;
+use App\Application\Api\Controllers\v1\GroupWork\GroupWorkController;
 use App\Application\Api\Resources\MemberGroupWork\MemberGroupWorkCollection;
 use App\Domain\Examables\GroupWork\Member\Services\MemberGroupWorkService;
 use App\Domain\Examables\GroupWork\Models\GroupWork;

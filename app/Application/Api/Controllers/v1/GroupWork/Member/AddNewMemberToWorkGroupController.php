@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Application\Api\Controllers\v1\MemberGroupWork;
+namespace App\Application\Api\Controllers\v1\GroupWork\Member;
 
-use App\Application\Api\Controllers\v1\GroupWorkController;
+use App\Application\Api\Controllers\v1\GroupWork\GroupWorkController;
 use App\Application\Api\Requests\MemberGroupWork\StoreMemberGroupWorkRequest;
 use App\Application\Api\Resources\GroupWork\GroupWorkResource;
 use App\Domain\Examables\GroupWork\Member\Models\Member;
 use App\Domain\Examables\GroupWork\Member\Services\MemberGroupWorkService;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AddNewMemberToWorkGroupController extends GroupWorkController

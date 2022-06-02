@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1\GroupWork\Member;
 
 use App\Domain\Examables\GroupWork\Member\Models\Member;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
+use Database\Seeders\SubjectSeeder;
 use Database\Seeders\Tests\GroupWork\GroupWorkTestSeeder;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
@@ -24,22 +25,18 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
 
     private User $user;
     private Subject $subject;
-    private Exam $exam;
-    private GroupWork $examGroupWork;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(GroupWorkTestSeeder::class);
+        $this->seed(SubjectSeeder::class);
 
-        $this->examGroupWork = GroupWork::first();
-
-        $this->exam = $this->examGroupWork->exam;
-
-        $this->subject = $this->exam->subject;
+        $this->subject =
+            Subject::first();
 
         $this->user = $this->subject->user;
+
 
         $this->withMiddleware(['auth:sanctum', 'verified']);
     }
@@ -55,23 +52,181 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
+        $examGroupWork = $this->generateGroupWork();
+
         $dataToAddNewMemberToGroupWork = Member::factory()->make(
             [
-                'group_work_id' => $this->examGroupWork
+                'group_work_id' =>
+                $examGroupWork
             ]
         )->toArray();
 
 
         $response = $this->postJson(
             route('members.add_new_member', [
-                'groupWork' => $this->examGroupWork
+                'groupWork' => $examGroupWork
             ]),
             $dataToAddNewMemberToGroupWork
         );
 
+
         $response->assertCreated();
 
 
-        $this->assertTrue($this->examGroupWork->members->contains('user_id', $dataToAddNewMemberToGroupWork['user_id']));
+        $this->assertTrue($examGroupWork->members->contains('user_id', $dataToAddNewMemberToGroupWork['user_id']));
+    }
+
+
+    /**
+     * 
+     * @test
+     */
+    public function exam_group_work_created_and_add_new_member_to_group_work_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $dataToCreateGroupWork = GroupWork::factory()->make(
+            [
+                'subject_id' => $this->subject,
+                'effective_date' => Exam::factory()->make()->effective_date,
+
+            ]
+        )->toArray();
+
+        $response = $this->postJson(
+            route('groupsWork.store'),
+            $dataToCreateGroupWork
+        );
+
+        $response->assertCreated();
+
+        $groupWorkId = $response->getData()->id;
+
+        $dataToAddNewMemberToGroupWork['user_id'] = User::factory()->create()->id;
+
+
+        $response = $this->postJson(
+            route('members.add_new_member', [
+                'groupWork' => $groupWorkId
+            ]),
+            $dataToAddNewMemberToGroupWork
+        );
+
+
+        $response->assertCreated();
+
+
+        $examGroupWork = GroupWork::find($groupWorkId);
+
+        $this->assertTrue($examGroupWork->members->contains('user_id', $dataToAddNewMemberToGroupWork['user_id']));
+    }
+
+
+
+    /**
+     * 
+     * @test
+     */
+    public function add_new_member_to_group_work_should_fail_because_user_not_exists()
+    {
+        Sanctum::actingAs($this->user);
+
+        $examGroupWork = $this->generateGroupWork();
+
+        $dataToAddNewMemberToGroupWork = Member::factory()->make(
+            [
+                'group_work_id' => $examGroupWork,
+                'user_id' => 100,
+            ]
+        )->toArray();
+
+
+        $response = $this->postJson(
+            route('members.add_new_member', [
+                'groupWork' => $examGroupWork
+            ]),
+            $dataToAddNewMemberToGroupWork
+        );
+
+
+        $response->assertUnprocessable();
+
+
+        $this->assertFalse($examGroupWork->members->contains('user_id', $dataToAddNewMemberToGroupWork['user_id']));
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function add_new_member_to_group_work_should_fail_because_group_work_not_exists()
+    {
+        Sanctum::actingAs($this->user);
+
+        $groupWorkId = 100;
+
+        $dataToAddNewMemberToGroupWork = Member::factory()->make(
+            [
+                'group_work_id' => $groupWorkId,
+            ]
+        )->toArray();
+
+
+        $response = $this->postJson(
+            route('members.add_new_member', [
+                'groupWork' => $groupWorkId
+            ]),
+            $dataToAddNewMemberToGroupWork
+        );
+
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function add_new_member_to_group_work_should_fail_because_user_already_in_group_work()
+    {
+        Sanctum::actingAs($this->user);
+
+        $examGroupWork = $this->generateGroupWork();
+
+        $dataToAddNewMemberToGroupWork = Member::factory()->make(
+            [
+                'group_work_id' => $examGroupWork,
+                'user_id' => $this->user,
+            ]
+        )->toArray();
+
+
+        $response = $this->postJson(
+            route('members.add_new_member', [
+                'groupWork' => $examGroupWork
+            ]),
+            $dataToAddNewMemberToGroupWork
+        );
+
+
+
+        $response = $this->postJson(
+            route('members.add_new_member', [
+                'groupWork' => $examGroupWork
+            ]),
+            $dataToAddNewMemberToGroupWork
+        );
+
+
+        $response->assertUnprocessable();
+    }
+
+
+    private function generateGroupWork(): GroupWork
+    {
+
+        $this->seed(GroupWorkTestSeeder::class);
+
+        return GroupWork::first();
     }
 }

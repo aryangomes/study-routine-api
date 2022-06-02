@@ -11,6 +11,7 @@ use Domain\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
+use Tests\Feature\Http\Controllers\Api\v1\GroupWorkControllerTest;
 use Tests\TestCase;
 
 /**
@@ -55,6 +56,7 @@ class RemoverMemberFromGroupWorkControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
+
         $memberToRemove = Member::factory()->create(
             [
                 'group_work_id' => $this->examGroupWork
@@ -72,5 +74,60 @@ class RemoverMemberFromGroupWorkControllerTest extends TestCase
         $response->assertNoContent();
 
         $this->assertFalse($this->examGroupWork->members->contains('user_id', $memberToRemove->user_id));
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function remove_member_from_group_work_should_fail_because_user_is_not_in_the_group_work()
+    {
+        Sanctum::actingAs($this->user);
+
+
+        $response = $this->deleteJson(
+            route('members.remove_member', [
+                'groupWork' => $this->examGroupWork->id,
+                'member' => 100,
+            ])
+        );
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function remove_member_from_group_work_should_fail_because_user_is_the_owner_of_group_work()
+    {
+
+        Sanctum::actingAs($this->user);
+
+        $dataToCreateGroupWork = GroupWork::factory()->make(
+            [
+                'subject_id' => $this->subject,
+                'effective_date' => Exam::factory()->make()->effective_date,
+
+            ]
+        )->toArray();
+
+        $response = $this->postJson(
+            route('groupsWork.store'),
+            $dataToCreateGroupWork
+        );
+
+
+        $member = Member::where('user_id', $this->user->id)->first();
+
+
+        $response = $this->deleteJson(
+            route('members.remove_member', [
+                'groupWork' => $this->examGroupWork->id,
+                'member' =>  $member->id,
+            ])
+        );
+
+        $response->assertUnprocessable();
     }
 }
