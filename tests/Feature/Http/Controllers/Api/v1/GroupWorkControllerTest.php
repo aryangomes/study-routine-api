@@ -1,11 +1,14 @@
 <?php
 
-namespace GroupWorks\Feature\Http\Controllers\Api\v1;
+namespace Tests\Feature\Http\Controllers\Api\v1;
 
+use App\Domain\Examables\GroupWork\Member\Models\Member;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
 use App\Support\Traits\UserCanAccessThisRoute;
+use Database\Seeders\Tests\GroupWork\GroupWorkTestSeeder;
+use Database\Seeders\UserSeeder;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,18 +39,15 @@ class GroupWorkControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = $this->createModelFromFactory(new User);
+        $this->seed(GroupWorkTestSeeder::class);
 
-        $this->subject = $this->createModelFromFactory(new Subject, [
-            'user_id' => $this->user
-        ]);
+        $this->examGroupWork = GroupWork::first();
 
-        $this->examGroupWork = GroupWork::factory()->create();
+        $this->exam = $this->examGroupWork->exam;
 
-        $this->exam = Exam::factory()->groupWork()->create([
-            'subject_id' => $this->subject,
-            'examable_id' =>    $this->examGroupWork->id,
-        ]);
+        $this->subject = $this->exam->subject;
+
+        $this->user = $this->subject->user;
 
         $this->initializeModelAndModelName('groupWork', $this->examGroupWork);
 
@@ -78,7 +78,6 @@ class GroupWorkControllerTest extends TestCase
         );
 
         $response->assertCreated();
-        $dataFromResponse = $response->getData();
 
 
         $this->assertEquals($dataToCreateGroupWork['effective_date'], GroupWork::find($response->getData()->id)->exam->effective_date);
@@ -212,6 +211,7 @@ class GroupWorkControllerTest extends TestCase
      */
     public function delete_exam_group_work_successfully()
     {
+
         Sanctum::actingAs($this->user);
         $response = $this->deleteJson(
             route(

@@ -2,9 +2,12 @@
 
 namespace App\Domain\Examables\GroupWork\Models;
 
+use App\Domain\Examables\GroupWork\Member\Models\Member;
 use Database\Factories\Examables\GroupWorkFactory;
 use Domain\Exam\Models\Exam;
+use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class GroupWork extends Exam
@@ -45,5 +48,24 @@ class GroupWork extends Exam
     public function exam(): MorphOne
     {
         return $this->morphOne(Exam::class, 'examable');
+    }
+
+    /**
+     * Get all of the members for the GroupWork
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function members(): HasMany
+    {
+        return $this->hasMany(Member::class, 'group_work_id', 'id');
+    }
+
+    /**
+     * Get the Owner of Group Work
+     * @return User
+     */
+    public function getUserMemberOwnerAttribute(): User
+    {
+        return $this->exam->subject->user;
     }
 }

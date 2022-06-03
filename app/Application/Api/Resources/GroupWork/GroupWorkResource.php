@@ -3,6 +3,7 @@
 namespace App\Application\Api\Resources\GroupWork;
 
 use App\Application\Api\Resources\Exam\ExamResource;
+use App\Application\Api\Resources\MemberGroupWork\MemberGroupWorkCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GroupWorkResource extends JsonResource
@@ -20,6 +21,7 @@ class GroupWorkResource extends JsonResource
             'exam' => new ExamResource($this->exam),
             "topic" => $this->topic,
             "note" => $this->note,
+            "members" => new MemberGroupWorkCollection($this->members),
 
         ];
     }
