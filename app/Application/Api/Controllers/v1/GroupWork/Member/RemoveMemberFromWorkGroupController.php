@@ -25,6 +25,7 @@ class RemoveMemberFromWorkGroupController extends GroupWorkController
     {
         $member = Member::find($memberId);
 
+
         if (!$member) {
             abort(Response::HTTP_NOT_FOUND, __('member.remove_member_errors.member_not_found'));
         }
@@ -32,7 +33,8 @@ class RemoveMemberFromWorkGroupController extends GroupWorkController
         if ($member->isOwnerOfGroupWork) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, __('member.remove_member_errors.member_is_owner'));
         }
-        // $this->authorize('delete', $member);
+        $this->authorize('delete', $member);
+
         $this->memberGroupWorkService->setGroupWork($groupWork);
         $this->memberGroupWorkService->setMember($member);
         $this->memberGroupWorkService->removeMemberToGroupWork();

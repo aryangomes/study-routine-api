@@ -29,6 +29,7 @@ class AddNewMemberToWorkGroupController extends GroupWorkController
     {
         $validatedData = $request->validated();
 
+        $this->authorize('addNewMember', $groupWork);
         $this->memberGroupWorkService = new MemberGroupWorkService($groupWork, new Member());
 
         $groupWorkWithMemberAdded = $this->memberGroupWorkService->addMemberToGroupWork($validatedData['user_id']);

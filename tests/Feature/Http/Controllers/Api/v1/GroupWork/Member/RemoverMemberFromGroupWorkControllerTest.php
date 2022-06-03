@@ -56,20 +56,37 @@ class RemoverMemberFromGroupWorkControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
+        $dataToCreateGroupWork = GroupWork::factory()->make(
+            [
+                'subject_id' => $this->subject,
+                'effective_date' => Exam::factory()->make()->effective_date,
+
+            ]
+        )->toArray();
+
+        $response = $this->postJson(
+            route('groupsWork.store'),
+            $dataToCreateGroupWork
+        );
+
+        $groupWorkId = $response->getData()->id;
+
+        $examGroupWork =  GroupWork::find($groupWorkId);
 
         $memberToRemove = Member::factory()->create(
             [
-                'group_work_id' => $this->examGroupWork
+                'group_work_id' => $examGroupWork
             ]
         );
 
 
         $response = $this->deleteJson(
             route('members.remove_member', [
-                'groupWork' => $this->examGroupWork->id,
+                'groupWork' => $examGroupWork,
                 'member' => $memberToRemove,
             ])
         );
+
 
         $response->assertNoContent();
 
@@ -129,5 +146,30 @@ class RemoverMemberFromGroupWorkControllerTest extends TestCase
         );
 
         $response->assertUnprocessable();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function remove_member_from_group_work_should_fail_because_user_authenticated_is_not_the_owner_of_group_work()
+    {
+        $members = Member::factory()->count(2)->create(
+            [
+                'group_work_id' => $this->examGroupWork
+            ]
+        );
+
+        Sanctum::actingAs($members[0]->user);
+
+
+        $response = $this->deleteJson(
+            route('members.remove_member', [
+                'groupWork' => $this->examGroupWork->id,
+                'member' => $members[1],
+            ])
+        );
+
+        $response->assertForbidden();
     }
 }

@@ -6,6 +6,7 @@ use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Support\Policies\BasePolicy;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
 
 class GroupWorkPolicy extends BasePolicy
@@ -103,6 +104,42 @@ class GroupWorkPolicy extends BasePolicy
         //
     }
 
+
+    /**
+     * Determine whether the user can a member to the group work.
+     *
+     * @param  \Domain\User\Models\User  $user
+     * @param  \App\Domain\Examables\GroupWork\Models\GroupWork $groupWork
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function addNewMember(User $user, GroupWork  $groupWork)
+    {
+        return
+            $this->userCanDoThisActionWithThisModel(
+                $user,
+                $groupWork->userMemberOwner->id,
+                'add_new_member_not_allowed'
+            );
+    }
+
+    /**
+     * Determine whether the user can view any models.
+     *
+     * @param  \Domain\User\Models\User  $user
+     * @param  \App\Domain\Examables\GroupWork\Models\GroupWork  $groupWork
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function viewMembers(User $user, GroupWork $groupWork)
+    {
+        $userCanViewMembersOfGroupWork = $groupWork->members->contains('user_id', $user->id);
+
+
+        return $this->userCanDoThisAction(
+            $userCanViewMembersOfGroupWork,
+            __('policies.group_work.members.view_members_not_allowed')
+        );
+    }
+
     /**
      *
      * @param \Illuminate\Database\Eloquent\Model $model
@@ -113,5 +150,16 @@ class GroupWorkPolicy extends BasePolicy
     {
         $userId = $model->exam->subject->user_id;
         return $userId;
+    }
+
+    protected function userCanDoThisActionWithThisModel(User $user, string $userId, string $actionName): Response
+    {
+        $userCanDoThisActionWithThisModel =  ($user->id === $userId) ?
+
+            $this->allow() : $this->deny(__("policies.group_work.{$actionName}", [
+                'record' => $this->recordName
+            ]));
+
+        return $userCanDoThisActionWithThisModel;
     }
 }

@@ -26,7 +26,7 @@ class GetMembersOfGroupWorkController extends GroupWorkController
         $this->memberGroupWorkService->setGroupWork($groupWork);
         $membersOfGroupWork = $this->memberGroupWorkService->getMembersOfGroupWork();
 
-
+        $this->authorize('viewMembers', $groupWork);
         return response()->json(
             new MemberGroupWorkCollection($membersOfGroupWork),
             Response::HTTP_OK
