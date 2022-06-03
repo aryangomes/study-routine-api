@@ -46,4 +46,17 @@ class Member extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the Owner's Group Work (who created the group work)
+     * 
+     * @return bool
+     */
+    public function getIsOwnerOfGroupWorkAttribute(): bool
+    {
+        $isOwnerOfGroupWork = ($this->groupWork->exam->subject->user_id ==
+            $this->user_id);
+
+        return $isOwnerOfGroupWork;
+    }
 }
