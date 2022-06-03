@@ -60,8 +60,27 @@ class GetMembersOfGroupWorkControllerTest extends TestCase
             ])
         );
 
+        $response->assertOk();
+
+        $response->assertJsonCount($this->examGroupWork->members->count());
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function get_members_of_group_work_should_fail_because_group_work_do_not_exist()
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->getJson(
+            route('members.get_members', [
+                'groupWork' => $this->examGroupWork->id
+            ])
+        );
 
         $response->assertOk();
+
         $response->assertJsonCount($this->examGroupWork->members->count());
     }
 }
