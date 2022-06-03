@@ -50,9 +50,10 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
      */
     public function add_new_member_to_group_work_successfully()
     {
-        Sanctum::actingAs($this->user);
-
         $examGroupWork = $this->generateGroupWork();
+
+        Sanctum::actingAs($examGroupWork->exam->subject->user);
+
 
         $dataToAddNewMemberToGroupWork = Member::factory()->make(
             [
@@ -68,6 +69,8 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
             ]),
             $dataToAddNewMemberToGroupWork
         );
+
+
 
 
         $response->assertCreated();
@@ -103,7 +106,6 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
         $groupWorkId = $response->getData()->id;
 
         $dataToAddNewMemberToGroupWork['user_id'] = User::factory()->create()->id;
-
 
         $response = $this->postJson(
             route('members.add_new_member', [
@@ -148,7 +150,6 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
             $dataToAddNewMemberToGroupWork
         );
 
-
         $response->assertUnprocessable();
 
 
@@ -189,11 +190,11 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
      */
     public function add_new_member_to_group_work_should_fail_because_user_already_in_group_work()
     {
-        Sanctum::actingAs($this->user);
-
         $examGroupWork = $this->generateGroupWork();
+        Sanctum::actingAs($examGroupWork->exam->subject->user);
 
-        $dataToAddNewMemberToGroupWork = Member::factory()->make(
+
+        $dataToAddNewMemberToGroupWork = Member::factory()->create(
             [
                 'group_work_id' => $examGroupWork,
                 'user_id' => $this->user,
@@ -209,6 +210,27 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
         );
 
 
+        $response->assertUnprocessable();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function add_new_member_to_group_work_should_fail_because_user_is_not_the_owner_of_group_work()
+    {
+        Sanctum::actingAs($this->user);
+        $examGroupWork = $this->generateGroupWork();
+
+
+        $dataToAddNewMemberToGroupWork = Member::factory()->make(
+            [
+                'group_work_id' => $examGroupWork,
+                'user_id' => $this->user,
+            ]
+        )->toArray();
+
+
 
         $response = $this->postJson(
             route('members.add_new_member', [
@@ -217,8 +239,7 @@ class AddNewMemberToGroupWorkControllerTest extends TestCase
             $dataToAddNewMemberToGroupWork
         );
 
-
-        $response->assertUnprocessable();
+        $response->assertForbidden();
     }
 
 

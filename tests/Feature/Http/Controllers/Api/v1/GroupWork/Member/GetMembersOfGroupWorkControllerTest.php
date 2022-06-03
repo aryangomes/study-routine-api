@@ -52,11 +52,18 @@ class GetMembersOfGroupWorkControllerTest extends TestCase
      */
     public function get_members_of_group_work_successfully()
     {
-        Sanctum::actingAs($this->user);
+        $user = $this->examGroupWork->exam->subject->user;
+        Sanctum::actingAs($user);
+
+        Member::factory()->create([
+            'group_work_id' => $this->examGroupWork,
+            'user_id' => $user,
+        ]);
+
 
         $response = $this->getJson(
             route('members.get_members', [
-                'groupWork' => $this->examGroupWork->id
+                'groupWork' => $this->examGroupWork
             ])
         );
 
@@ -75,12 +82,28 @@ class GetMembersOfGroupWorkControllerTest extends TestCase
 
         $response = $this->getJson(
             route('members.get_members', [
+                'groupWork' => 200
+            ])
+        );
+
+        $response->assertNotFound();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function get_members_of_group_work_should_fail_because_user_not_member_of_this_group_work()
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->getJson(
+            route('members.get_members', [
                 'groupWork' => $this->examGroupWork->id
             ])
         );
 
-        $response->assertOk();
 
-        $response->assertJsonCount($this->examGroupWork->members->count());
+        $response->assertForbidden();
     }
 }

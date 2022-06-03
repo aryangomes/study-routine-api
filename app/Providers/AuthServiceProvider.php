@@ -16,6 +16,7 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         'App\Domain\Examables\Test\Models\Test' => 'App\Domain\Examables\Test\Policies\TestPolicy',
         'App\Domain\Examables\GroupWork\Models\GroupWork' => 'App\Domain\Examables\GroupWork\Policies\GroupWorkPolicy',
+        'App\Domain\Examables\GroupWork\Member\Models\Member' => 'App\Domain\Examables\GroupWork\Member\Policies\MemberPolicy',
     ];
 
     /**
