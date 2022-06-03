@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Application\Api\Controllers\v1;
+namespace App\Application\Api\Controllers\v1\GroupWork;
 
+use App\Application\Api\Controllers\v1\BaseApiController;
 use App\Application\Api\Requests\GroupWork\StoreGroupWorkRequest;
 use App\Application\Api\Requests\GroupWork\UpdateGroupWorkRequest;
 use App\Application\Api\Resources\GroupWork\GroupWorkCollection;
@@ -9,7 +10,6 @@ use App\Application\Api\Resources\GroupWork\GroupWorkResource;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Domain\Examables\GroupWork\Services\GroupWorkService;
 use Domain\Subject\Models\Subject;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class GroupWorkController extends BaseApiController

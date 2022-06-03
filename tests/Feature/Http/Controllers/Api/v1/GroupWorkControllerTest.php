@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
+use App\Domain\Examables\GroupWork\Member\Models\Member;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
@@ -77,7 +78,6 @@ class GroupWorkControllerTest extends TestCase
         );
 
         $response->assertCreated();
-        $dataFromResponse = $response->getData();
 
 
         $this->assertEquals($dataToCreateGroupWork['effective_date'], GroupWork::find($response->getData()->id)->exam->effective_date);
