@@ -1,0 +1,30 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class {{ class }} extends TestCase
+{
+    /**
+     *
+     * @test
+     *
+     */
+    public function action_successfully()
+    {
+        $this->assertTrue(true);
+    }
+
+    /**
+     *
+     * @test
+     *
+     */
+    public function action_should_fail()
+    {
+        $this->assertFalse(false);
+    }
+}
