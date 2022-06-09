@@ -18,7 +18,7 @@ class CrudModelOperationsService
     protected Create $createAction;
     protected Update $updateAction;
     protected Delete $deleteAction;
-    public function __construct(private Model $model)
+    public function __construct(protected Model $model)
     {
         $this->getAllAction = new GetAll($model);
         $this->createAction = new Create($model);
