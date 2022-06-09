@@ -50,6 +50,8 @@ class RouteServiceProvider extends ServiceProvider
 
             $this->mapMembersGroupWorkApiRoutes();
 
+            $this->mapHomeworkApiRoutes();
+
 
             Route::middleware('web')
                 ->namespace($this->namespace)
@@ -85,5 +87,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/v1/members_group_work.php'));
+    }
+
+    private function mapHomeworkApiRoutes()
+    {
+
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/homework.php'));
     }
 }
