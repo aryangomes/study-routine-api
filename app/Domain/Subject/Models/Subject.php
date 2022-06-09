@@ -2,6 +2,7 @@
 
 namespace Domain\Subject\Models;
 
+use App\Domain\Homework\Models\Homework;
 use Database\Factories\SubjectFactory;
 use Domain\Exam\Models\Exam;
 use Domain\User\Models\User;
@@ -54,5 +55,15 @@ class Subject extends Model
     public function exams(): HasMany
     {
         return $this->hasMany(Exam::class);
+    }
+
+    /**
+     * Get all of the homeworks for the Subject
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function homeworks(): HasMany
+    {
+        return $this->hasMany(Homework::class);
     }
 }
