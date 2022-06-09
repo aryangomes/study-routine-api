@@ -8,6 +8,13 @@ use Tests\TestCase;
 
 class {{ class }} extends TestCase
 {
+    use  RefreshDatabase,WithFaker;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     /**
      *
      * @test
