@@ -2,7 +2,7 @@
 
 namespace Domain\Examables\Test\Models;
 
-use Database\Factories\Examables\TestFactory;
+use Database\Factories\Examables\Test\TestFactory;
 use Domain\Exam\Models\Exam;
 use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;

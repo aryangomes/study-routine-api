@@ -5,11 +5,11 @@ use App\Application\Api\Controllers\v1\Authentication\EmailVerification\ResendEm
 use App\Application\Api\Controllers\v1\Authentication\LoginController;
 use App\Application\Api\Controllers\v1\Authentication\LogoutController;
 use App\Application\Api\Controllers\v1\Authentication\RegisterUserController;
-use App\Application\Api\Controllers\v1\ExamTest\AddNewTopicController;
-use App\Application\Api\Controllers\v1\ExamTest\GetTopicsController;
-use App\Application\Api\Controllers\v1\ExamTestsController;
+use App\Application\Api\Controllers\v1\Examables\Test\AddNewTopicController;
+use App\Application\Api\Controllers\v1\Examables\Test\GetTopicsController;
+use App\Application\Api\Controllers\v1\Examables\Test\TestController;
 use App\Application\Api\Controllers\v1\SubjectController;
-use App\Application\Api\Controllers\v1\TopicController;
+use App\Application\Api\Controllers\v1\Examables\Test\Topic\TopicController;
 use App\Application\Api\Controllers\v1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,7 +70,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
      */
     Route::prefix('exams')->group(function () {
 
-        Route::apiResource('tests', ExamTestsController::class);
+        Route::apiResource('tests', TestController::class);
 
         Route::post('/tests/{test}/addNewTopic', AddNewTopicController::class)
             ->name('tests.add_new_topic');

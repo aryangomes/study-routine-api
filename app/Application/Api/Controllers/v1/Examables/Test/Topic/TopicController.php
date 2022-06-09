@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Application\Api\Controllers\v1\Examables\Test\Topic;
+
+use App\Application\Api\Controllers\v1\BaseApiController;
+use App\Application\Api\Requests\Examables\Test\Topic\StoreTopicRequest;
+use App\Application\Api\Requests\Examables\Test\Topic\UpdateTopicRequest;
+use App\Application\Api\Resources\Examables\Test\TestResource;
+use App\Support\Services\CrudModelOperationsService;
+use Domain\Examables\Test\Topic\Models\Topic;
+use Illuminate\Http\Response;
+
+class TopicController extends BaseApiController
+{
+
+    private CrudModelOperationsService $crudModelOperationsService;
+    public function __construct()
+    {
+        $this->crudModelOperationsService = new CrudModelOperationsService(new Topic());
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $this->routeNotImplemented();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreTopicRequest $request)
+    {
+        $this->routeNotImplemented();
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  Topic $topic
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Topic $topic)
+    {
+        $this->routeNotImplemented();
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  Topic $topic
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateTopicRequest $request, Topic $topic)
+    {
+        $this->authorize('update', $topic);
+
+        $dataValidated = $request->validated();
+
+        $topicUpdated = $this->crudModelOperationsService->update($topic,   $dataValidated);
+
+        return response()->json(new TestResource($topicUpdated->test));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  Topic $topic
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Topic $topic)
+    {
+        $this->authorize('delete', $topic);
+        $this->crudModelOperationsService->delete($topic);
+
+        return response()->json(status: Response::HTTP_NO_CONTENT);
+    }
+}

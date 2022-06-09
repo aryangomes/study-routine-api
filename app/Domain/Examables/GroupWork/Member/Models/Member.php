@@ -3,7 +3,7 @@
 namespace App\Domain\Examables\GroupWork\Member\Models;
 
 use App\Domain\Examables\GroupWork\Models\GroupWork;
-use Database\Factories\Examables\GroupWork\MemberFactory;
+use Database\Factories\Examables\GroupWork\Member\MemberFactory;
 use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

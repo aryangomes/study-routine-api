@@ -2,7 +2,7 @@
 
 namespace Domain\Examables\Test\Topic\Models;
 
-use Database\Factories\TopicFactory;
+use Database\Factories\Examables\Test\Topic\TopicFactory;
 use Domain\Examables\Test\Models\Test;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
