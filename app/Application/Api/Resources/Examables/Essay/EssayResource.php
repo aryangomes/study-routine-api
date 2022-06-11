@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Application\Api\Resources\Exam;
+namespace App\Application\Api\Resources\Examables\Essay;
 
+use App\Application\Api\Resources\Exam\ExamResource;
 use App\Application\Api\Resources\Subject\SubjectResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExamResource extends JsonResource
+class EssayResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,9 +18,9 @@ class ExamResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'effective_date' => $this->effective_date,
-            'subject' => new SubjectResource($this->subject),
-
+            'topic' => $this->topic,
+            'observation' => $this->observation,
+            'exam' => new ExamResource($this->exam)
         ];
     }
 }

@@ -13,7 +13,7 @@ class UpdateExamRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,10 +21,10 @@ class UpdateExamRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
-            //
+            'effective_date' => ['after_or_equal:today'],
         ];
     }
 }

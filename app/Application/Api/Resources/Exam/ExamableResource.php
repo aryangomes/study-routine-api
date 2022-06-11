@@ -5,7 +5,7 @@ namespace App\Application\Api\Resources\Exam;
 use App\Application\Api\Resources\Subject\SubjectResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ExamResource extends JsonResource
+class ExamableResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,7 +19,7 @@ class ExamResource extends JsonResource
             'id' => $this->id,
             'effective_date' => $this->effective_date,
             'subject' => new SubjectResource($this->subject),
-
+            'examable' => $this->examable,
         ];
     }
 }
