@@ -13,7 +13,7 @@ class StoreExamRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,10 +21,11 @@ class StoreExamRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
-            //
+            'subject_id' => ['required', 'exists:subjects,id'],
+            'effective_date' => ['required', 'after_or_equal:today'],
         ];
     }
 }

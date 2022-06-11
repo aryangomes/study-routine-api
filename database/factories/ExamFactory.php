@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Domain\Examables\Essay\Models\Essay;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
@@ -67,6 +68,25 @@ class ExamFactory extends Factory
                 'examable_id' => GroupWork::factory()->create(),
                 'subject_id' => Subject::factory()->create(),
                 'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
+
+            ];
+        });
+    }
+
+    /**
+     * Indicate this exam is a essay.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function essay()
+    {
+        return $this->state(function (array $attributes) {
+
+            return [
+                'examable_type' => Essay::class,
+                'examable_id' => Essay::factory()->create(),
+                'subject_id' => $attributes['subject_id'],
+                'effective_date' => $attributes['effective_date'],
 
             ];
         });

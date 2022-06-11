@@ -46,12 +46,13 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/api.php'));
 
 
-            $this->mapGroupsWorkApiRoutes();
+            $this->mapGroupWorkApiRoutes();
 
-            $this->mapMembersGroupWorkApiRoutes();
+            $this->mapMemberGroupWorkApiRoutes();
 
             $this->mapHomeworkApiRoutes();
 
+            $this->mapEssayApiRoutes();
 
             Route::middleware('web')
                 ->namespace($this->namespace)
@@ -71,7 +72,7 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
-    private function mapGroupsWorkApiRoutes()
+    private function mapGroupWorkApiRoutes()
     {
 
         Route::prefix('api/v1/')
@@ -80,7 +81,7 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/api/v1/group_work.php'));
     }
 
-    private function mapMembersGroupWorkApiRoutes()
+    private function mapMemberGroupWorkApiRoutes()
     {
 
         Route::prefix('api/v1/groupsWork/{groupWork}')
@@ -96,5 +97,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/v1/homework.php'));
+    }
+
+    private function mapEssayApiRoutes()
+    {
+
+        Route::prefix('api/v1/exams')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/essay.php'));
     }
 }
