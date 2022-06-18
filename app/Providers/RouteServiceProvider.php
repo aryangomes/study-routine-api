@@ -40,19 +40,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            Route::prefix('api/v1')
-                ->middleware('api')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/api.php'));
 
 
-            $this->mapGroupWorkApiRoutes();
-
-            $this->mapMemberGroupWorkApiRoutes();
-
-            $this->mapHomeworkApiRoutes();
-
-            $this->mapEssayApiRoutes();
+            $this->mapApiRoutes();
 
             Route::middleware('web')
                 ->namespace($this->namespace)
@@ -70,6 +60,25 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
         });
+    }
+
+    private function mapApiRoutes(): void
+    {
+        Route::prefix('api/v1')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api.php'));
+
+
+        $this->mapGroupWorkApiRoutes();
+
+        $this->mapMemberGroupWorkApiRoutes();
+
+        $this->mapHomeworkApiRoutes();
+
+        $this->mapEssayApiRoutes();
+
+        $this->mapDailyActivityApiRoutes();
     }
 
     private function mapGroupWorkApiRoutes()
@@ -106,5 +115,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/v1/essay.php'));
+    }
+
+    private function mapDailyActivityApiRoutes()
+    {
+
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/daily_activity.php'));
     }
 }

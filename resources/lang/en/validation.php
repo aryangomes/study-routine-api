@@ -148,6 +148,9 @@ return [
         'subject_id' => [
             'exists' => 'Subject does not exist.',
         ],
+        'end_time' => [
+            'after' => 'The end time must be a time after start time.',
+        ],
 
     ],
 
