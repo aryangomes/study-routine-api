@@ -3,7 +3,7 @@
 namespace Domain\Examables\Test\Topic\Policies;
 
 use App\Support\Policies\BasePolicy;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;

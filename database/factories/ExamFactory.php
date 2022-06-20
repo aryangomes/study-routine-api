@@ -6,7 +6,7 @@ use App\Domain\Examables\Essay\Models\Essay;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\WithFaker;
 
@@ -47,9 +47,8 @@ class ExamFactory extends Factory
             return [
                 'examable_type' => Test::class,
                 'examable_id' => Test::factory()->create(),
-                'subject_id' => Subject::factory()->create(),
-                'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
-
+                'subject_id' => $attributes['subject_id'],
+                'effective_date' => $attributes['effective_date'],
             ];
         });
     }
@@ -66,9 +65,8 @@ class ExamFactory extends Factory
             return [
                 'examable_type' => GroupWork::class,
                 'examable_id' => GroupWork::factory()->create(),
-                'subject_id' => Subject::factory()->create(),
-                'effective_date' => $this->faker->dateTimeBetween('now', '+15 days'),
-
+                'subject_id' => $attributes['subject_id'],
+                'effective_date' => $attributes['effective_date'],
             ];
         });
     }

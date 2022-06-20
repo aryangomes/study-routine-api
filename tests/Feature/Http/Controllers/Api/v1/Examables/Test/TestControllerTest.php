@@ -4,7 +4,7 @@ namespace Tests\Feature\Http\Controllers\Api\v1\Examables\Test;
 
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;

@@ -4,7 +4,7 @@ namespace App\Application\Api\Controllers\v1\Examables\Test;
 
 use App\Application\Api\Controllers\Controller;
 use App\Application\Api\Resources\Examables\Test\Topic\TopicCollection;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 
 class GetTopicsController extends Controller
 {

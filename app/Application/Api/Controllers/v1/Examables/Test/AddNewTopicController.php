@@ -4,7 +4,7 @@ namespace App\Application\Api\Controllers\v1\Examables\Test;
 
 use App\Application\Api\Requests\Examables\Test\Topic\StoreTopicRequest;
 use App\Application\Api\Resources\Examables\Test\TestResource;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Illuminate\Http\Response;
 
 class AddNewTopicController extends TestController

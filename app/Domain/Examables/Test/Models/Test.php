@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\Examables\Test\Models;
+namespace App\Domain\Examables\Test\Models;
 
 use Database\Factories\Examables\Test\TestFactory;
 use Domain\Exam\Models\Exam;
@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * 
  * Test is a Exam
  * 
- * @property int $id
- * @property int $exam_id
  * 
  */
 class Test extends Exam

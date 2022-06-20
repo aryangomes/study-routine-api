@@ -4,11 +4,11 @@ namespace Tests\Feature\Http\Controllers\Api\v1\Examables\Test\Topic;
 
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
-use Domain\Examables\Test\Topic\Models\Topic;
 use Domain\User\Models\User;
 use App\Support\Traits\CreateAModelFromFactory;
 use App\Support\Traits\UserCanAccessThisRoute;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
+use Domain\Examables\Test\Topic\Models\Topic;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
@@ -142,7 +142,7 @@ class TopicControllerTest extends TestCase
         );
 
         $topic = $this->createModelFromFactory(
-            new Topic,
+            new Topic(),
             [
                 'test_id' => $this->examTest->examable_id
             ]
