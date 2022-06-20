@@ -7,7 +7,7 @@ use App\Application\Api\Requests\Examables\Test\StoreTestRequest;
 use App\Application\Api\Requests\Examables\Test\UpdateTestRequest;
 use App\Application\Api\Resources\Examables\Test\TestCollection;
 use App\Application\Api\Resources\Examables\Test\TestResource;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Domain\Subject\Models\Subject;
 use Domain\Examables\Test\Services\ExamTestService;
 use Illuminate\Http\Response;

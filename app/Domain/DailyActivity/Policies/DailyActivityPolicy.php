@@ -1,23 +1,17 @@
 <?php
 
-namespace Domain\Examables\Test\Topic\Policies;
+namespace App\Domain\DailyActivity\Policies;
 
-use App\Support\Policies\BasePolicy;
-use App\Domain\Examables\Test\Models\Test;
-use Domain\Examables\Test\Topic\Models\Topic;
+use App\Domain\DailyActivity\Models\DailyActivity;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Policies\BasePolicy;
 
-class TopicPolicy extends BasePolicy
+class DailyActivityPolicy extends BasePolicy
 {
     use HandlesAuthorization;
 
-
-    public function __construct()
-    {
-        $this->recordName = 'Topic';
-    }
     /**
      * Determine whether the user can view any models.
      *
@@ -33,70 +27,66 @@ class TopicPolicy extends BasePolicy
      * Determine whether the user can view the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Topic  $topic
+     * @param  \App\Domain\DailyActivity\Models\DailyActivity  $dailyActivity
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Topic $topic)
+    public function view(User $user, DailyActivity $dailyActivity)
     {
-        $userId = $this->getUserIdFromModel($topic);
-        return $this->userCanViewThisModel($user, $userId);
-    }
-
-    /**
-     * Determine whether the user can add a new topic to test.
-     *
-     * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Examables\Test $test
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user, Test $test)
-    {
-        return true;
-        $userId = $test->exam->subject->user_id;
-
-        return $this->userCanDoThisActionWithThisModel(
+        return $this->userCanViewThisModel(
             $user,
-            $userId,
-            'create'
+            $this->getUserIdFromModel($dailyActivity)
         );
     }
 
+    /**
+     * Determine whether the user can create models.
+     *
+     * @param  \Domain\User\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function create(User $user)
+    {
+        return $this->userCanCreateThisModel($user, $user->id);
+    }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Topic  $topic
+     * @param  \App\Domain\DailyActivity\Models\DailyActivity  $dailyActivity
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Topic $topic)
+    public function update(User $user, DailyActivity $dailyActivity)
     {
-        $userId = $this->getUserIdFromModel($topic);
-        return $this->userCanUpdateThisModel($user, $userId);
+        return $this->userCanUpdateThisModel(
+            $user,
+            $this->getUserIdFromModel($dailyActivity)
+        );
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Topic  $topic
+     * @param  \App\Domain\DailyActivity\Models\DailyActivity  $dailyActivity
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Topic $topic)
+    public function delete(User $user, DailyActivity $dailyActivity)
     {
-
-        $userId = $this->getUserIdFromModel($topic);
-        return $this->userCanDeleteThisModel($user, $userId);
+        return $this->userCanDeleteThisModel(
+            $user,
+            $this->getUserIdFromModel($dailyActivity)
+        );
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Topic  $topic
+     * @param  \App\Domain\DailyActivity\Models\DailyActivity  $dailyActivity
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Topic $topic)
+    public function restore(User $user, DailyActivity $dailyActivity)
     {
         //
     }
@@ -105,10 +95,10 @@ class TopicPolicy extends BasePolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \Domain\User\Models\User  $user
-     * @param  \App\Models\Topic  $topic
+     * @param  \App\Domain\DailyActivity\Models\DailyActivity  $dailyActivity
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Topic $topic)
+    public function forceDelete(User $user, DailyActivity $dailyActivity)
     {
         //
     }
@@ -119,9 +109,8 @@ class TopicPolicy extends BasePolicy
      *
      * @return string
      */
-    protected function getUserIdFromModel(Model $model): string
+    function getUserIdFromModel(Model $model): string
     {
-        $userId = $model->test->exam->subject->user_id;
-        return $userId;
+        return $model->activitable->subject->user_id;
     }
 }

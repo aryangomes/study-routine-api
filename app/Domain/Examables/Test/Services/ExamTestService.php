@@ -7,7 +7,7 @@ use App\Support\Actions\CrudModelOperations\Create;
 use Domain\Exam\Models\Exam;
 use Domain\Examables\Test\Topic\Models\Topic;
 use App\Support\Services\CrudModelOperationsService;
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 

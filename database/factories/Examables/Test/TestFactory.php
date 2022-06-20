@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Examables\Test;
 
-use Domain\Examables\Test\Models\Test;
+use App\Domain\Examables\Test\Models\Test;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TestFactory extends Factory
