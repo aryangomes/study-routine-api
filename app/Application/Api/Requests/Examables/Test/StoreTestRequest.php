@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Requests\Examables\Test;
 
+use App\Application\Api\Requests\Exam\StoreExamRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTestRequest extends FormRequest
@@ -23,14 +24,19 @@ class StoreTestRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //Exam's rules
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'effective_date' => ['required', 'after_or_equal:today'],
-            //Topic's rules
-            'topics' => ['sometimes', 'array'],
-            'topics.*.name' => ['string', 'max:150', 'required_with:topics'],
 
-        ];
+
+        $testValidation =
+            [
+                'topics' => ['sometimes', 'array'],
+                'topics.*.name' => ['string', 'max:150', 'required_with:topics'],
+            ];
+
+        $testValidation = array_merge(
+            $testValidation,
+            StoreExamRequest::rules()
+        );
+
+        return  $testValidation;
     }
 }

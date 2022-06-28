@@ -24,7 +24,7 @@ class StoreMemberGroupWorkRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|uuid|exists:users,id|unique:members_group_work,user_id'
+            'user_id' => ['required', 'uuid', 'exists:users,id', 'unique:members_group_work,user_id']
         ];
     }
 }

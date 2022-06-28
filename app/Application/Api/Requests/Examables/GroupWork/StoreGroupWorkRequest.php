@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Requests\Examables\GroupWork;
 
+use App\Application\Api\Requests\Exam\StoreExamRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreGroupWorkRequest extends FormRequest
@@ -23,15 +24,21 @@ class StoreGroupWorkRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //Exam's rules
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'effective_date' => ['required', 'after_or_equal:today'],
-            //Group Work's rules 
-            'topic' => ['required', 'max:150', 'string'],
-            'note' => ['max:250', 'string'],
-            'members' => ['sometimes', 'array'],
-            'members.*.user_id' => ['exists:users,id', 'required_with:topics'],
-        ];
+
+        $groupWorkValidation =
+            [
+                'topic' => ['required', 'max:150', 'string'],
+                'note' => ['max:250', 'string'],
+                'members' => ['sometimes', 'array'],
+                'members.*.user_id' => ['required_with:members', 'uuid', 'exists:users,id'],
+
+            ];
+
+        $groupWorkValidation = array_merge(
+            $groupWorkValidation,
+            StoreExamRequest::rules()
+        );
+
+        return  $groupWorkValidation;
     }
 }

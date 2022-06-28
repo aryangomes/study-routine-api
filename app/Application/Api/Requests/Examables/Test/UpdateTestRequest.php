@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Requests\Examables\Test;
 
+use App\Application\Api\Requests\Exam\UpdateExamRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateTestRequest extends FormRequest
@@ -23,9 +24,6 @@ class UpdateTestRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'effective_date' => ['sometimes', 'required', 'after_or_equal:today'],
-
-        ];
+        return UpdateExamRequest::rules();
     }
 }

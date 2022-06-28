@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Requests\Examables\GroupWork;
 
+use App\Application\Api\Requests\Exam\UpdateExamRequest;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateGroupWorkRequest extends FormRequest
@@ -23,10 +24,18 @@ class UpdateGroupWorkRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'effective_date' => ['sometimes', 'after_or_equal:today'],
-            'topic' => ['sometimes', 'max:150', 'string'],
-            'note' => ['max:250', 'string'],
-        ];
+
+        $groupWorkValidation =
+            [
+                'topic' => ['sometimes', 'max:150', 'string'],
+                'note' => ['max:250', 'string'],
+            ];
+
+        $groupWorkValidation = array_merge(
+            $groupWorkValidation,
+            UpdateExamRequest::rules()
+        );
+
+        return  $groupWorkValidation;
     }
 }

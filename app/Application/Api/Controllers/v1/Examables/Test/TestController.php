@@ -9,13 +9,13 @@ use App\Application\Api\Resources\Examables\Test\TestCollection;
 use App\Application\Api\Resources\Examables\Test\TestResource;
 use App\Domain\Examables\Test\Models\Test;
 use Domain\Subject\Models\Subject;
-use Domain\Examables\Test\Services\ExamTestService;
+use Domain\Examables\Test\Services\TestService;
 use Illuminate\Http\Response;
 
 class TestController extends Controller
 {
 
-    public function __construct(protected ExamTestService $examTestService)
+    public function __construct(protected TestService $examTestService)
     {
     }
 

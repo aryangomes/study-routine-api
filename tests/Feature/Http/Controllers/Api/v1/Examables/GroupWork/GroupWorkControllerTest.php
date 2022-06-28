@@ -83,6 +83,8 @@ class GroupWorkControllerTest extends TestCase
         $this->assertEquals($dataToCreateGroupWork['effective_date'], GroupWork::find($response->getData()->id)->exam->effective_date);
     }
 
+
+
     /**
      * 
      * @test
@@ -99,6 +101,48 @@ class GroupWorkControllerTest extends TestCase
         );
 
         $response->assertUnprocessable();
+    }
+
+    /**
+     * 
+     * @test
+     */
+    public function exam_group_work_with_members_created_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $membersQuantityWithoutOwnerMemberOfGroupWork = 3;
+
+        $memberForGroupWork =
+            [
+                'members' =>
+                Member::factory()
+                    ->withoutGroupWork()
+                    ->count($membersQuantityWithoutOwnerMemberOfGroupWork)
+                    ->create()
+                    ->toArray()
+            ];
+
+        $dataToCreateGroupWork = GroupWork::factory()->make(
+            [
+                'subject_id' => $this->subject,
+                'effective_date' => $this->exam->effective_date,
+
+            ]
+        )->toArray();
+
+        $dataToCreateGroupWork = array_merge($dataToCreateGroupWork, $memberForGroupWork);
+
+        $response = $this->postJson(
+            route('groupsWork.store'),
+            $dataToCreateGroupWork
+        );
+
+        $response->assertCreated();
+
+        $this->assertCount(($membersQuantityWithoutOwnerMemberOfGroupWork + 1),
+            GroupWork::find($response->getData()->id)->members
+        );
     }
 
     /**

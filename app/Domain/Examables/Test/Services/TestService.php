@@ -8,10 +8,11 @@ use Domain\Exam\Models\Exam;
 use Domain\Examables\Test\Topic\Models\Topic;
 use App\Support\Services\CrudModelOperationsService;
 use App\Domain\Examables\Test\Models\Test;
+use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class ExamTestService extends CrudModelOperationsService
+class TestService extends CrudModelOperationsService
 {
 
     public function __construct(private Test $test)
@@ -39,10 +40,11 @@ class ExamTestService extends CrudModelOperationsService
 
         $this->test = $this->storeTest($dataToCreateCollection);
 
+        throw_if(is_null($this->test), RegisterRecordFailException::class);
+
         $this->storeExam($dataToCreateCollection);
 
-        $hasTestsTopicToStore = ($dataToCreateCollection->has('topics') &&
-            ($dataToCreateCollection->count() > 0));
+        $hasTestsTopicToStore = ($dataToCreateCollection->has('topics'));
 
         if ($hasTestsTopicToStore) {
             $this->storeTopicTest($dataToCreateCollection);
@@ -73,38 +75,37 @@ class ExamTestService extends CrudModelOperationsService
         return $test;
     }
 
-    private function filterDataToCreateExam(Collection $dataToCreate): array
+    private function filterDataToCreateExam(Collection $dataToCreate): Collection
     {
+        $filter = ['subject_id', 'effective_date'];
 
-        $collectionDataToCreate = $dataToCreate->only(
-            ['subject_id', 'effective_date']
-        );
+        $collectionDataToCreate = $dataToCreate->only($filter);
 
         $collectionDataToCreate->put('examable_id', $this->test->id);
 
         $collectionDataToCreate->put('examable_type', $this->test::class);
 
 
-        $dataToCreateExam = $collectionDataToCreate->toArray();
-
-        return $dataToCreateExam;
+        return $collectionDataToCreate;
     }
 
 
     private function filterDataToCreateTopic(Collection $dataToCreate): Collection
     {
-        $collectionDataToCreate = $dataToCreate->only('topics')->flatten(1);
+        $filter = ['topics'];
+
+        $collectionDataToCreate = $dataToCreate->only($filter)->flatten(1);
 
         return $collectionDataToCreate;
     }
 
-    private function storeExam($dataToCreate): Exam
+    private function storeExam($dataToCreateExam): void
     {
         $createExamAction = new Create(new Exam());
 
-        $examCreated = $createExamAction($this->filterDataToCreateExam($dataToCreate));
+        $dataToCreateExamFiltered = $this->filterDataToCreateExam($dataToCreateExam);
 
-        return $examCreated;
+        $createExamAction($dataToCreateExamFiltered->toArray());
     }
 
     private function storeTest(): Test
@@ -120,9 +121,13 @@ class ExamTestService extends CrudModelOperationsService
     {
         $topicsToBeCreated = $this->filterDataToCreateTopic($dataToCreate);
 
+        if (($topicsToBeCreated->count()) <= 0) {
+            return;
+        }
+
         $createTopicAction = new Create(new Topic());
 
-        $topicsToBeCreated->each(function ($item) use ($createTopicAction, $dataToCreate) {
+        $topicsToBeCreated->each(function ($item) use ($createTopicAction) {
             $item['test_id'] = $this->test->id;
 
             $createTopicAction($item);

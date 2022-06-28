@@ -7,6 +7,7 @@ use App\Domain\Exam\Actions\CreateExam;
 use App\Domain\Examables\GroupWork\Member\Actions\AddMemberToGroupWork;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Support\Actions\CrudModelOperations\Create;
+use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use App\Support\Services\CrudModelOperationsService;
 use Domain\Exam\Models\Exam;
 use Illuminate\Support\Arr;
@@ -43,24 +44,17 @@ class GroupWorkService extends CrudModelOperationsService
     **/
     public function create(array $dataToCreate): GroupWork
     {
+        $dataToCreateCollection = collect($dataToCreate);
 
-        $dataToCreateGroupWork = Arr::only($dataToCreate, ['topic', 'note']);
+        $this->groupWork = $this->storeGroupWork($dataToCreateCollection);
 
-        $createGroupWork = new Create(new GroupWork());
-        $this->groupWork = $createGroupWork($dataToCreateGroupWork);
+        throw_if(is_null($this->groupWork), RegisterRecordFailException::class);
 
-        $dataToCreateExam = Arr::only($dataToCreate, ['effective_date', 'subject_id']);
-        $dataToCreateExam = Arr::Add($dataToCreateExam, 'examable_type', GroupWork::class);
-        $dataToCreateExam = Arr::Add($dataToCreateExam, 'examable_id', $this->groupWork->id);
+        $this->storeExam($dataToCreateCollection);
 
-        $createExam = new Create(new Exam());
-        $exam = $createExam($dataToCreateExam);
+        $this->addDefaultMemberToGroupWork();
 
-        $addDefaultMemberGroupWork = new AddMemberToGroupWork($this->groupWork);
-
-        $authenticatedUser = auth()->user();
-
-        $addDefaultMemberGroupWork($authenticatedUser->getAuthIdentifier());
+        $this->addMembersToGroupWork($dataToCreateCollection);
 
         return $this->groupWork;
     }
@@ -74,5 +68,89 @@ class GroupWorkService extends CrudModelOperationsService
         $updateAction($groupWork->exam, $dataToUpdate);
 
         return $groupWork;
+    }
+
+    private function filterDataToCreateGroupWork(Collection $dataToCreate): Collection
+    {
+        $filter = ['topic', 'note'];
+
+        $dataToCreateGroupWork = $dataToCreate->only($filter);
+
+        return $dataToCreateGroupWork;
+    }
+
+    private function filterDataToCreateExam(Collection $dataToCreate): Collection
+    {
+        $filter = ['effective_date', 'subject_id'];
+
+        $dataToCreateExam = $dataToCreate->only($filter);
+
+        $dataToCreateExam = $dataToCreate->put('examable_type', GroupWork::class);
+
+        $dataToCreateExam = $dataToCreate->put('examable_id', $this->groupWork->id);
+
+        return $dataToCreateExam;
+    }
+
+    private function filterDataToAddMemberToGroupWork(Collection $dataToCreate): Collection
+    {
+        $filter = ['members'];
+
+        $filterDataToAddMemberToGroupWork = $dataToCreate->only($filter);
+
+        if (!$filterDataToAddMemberToGroupWork->has('members')) {
+            return collect([]);
+        }
+
+        $dataToAddMembersToGroupWork = collect(
+            $filterDataToAddMemberToGroupWork->get('members')
+        );
+
+        return $dataToAddMembersToGroupWork;
+    }
+
+
+    private function storeGroupWork(Collection $dataToCreateGroupWork): GroupWork
+    {
+        $dataToCreateGroupWorkFiltered = $this->filterDataToCreateGroupWork($dataToCreateGroupWork);
+
+        $createGroupWork = new Create(new GroupWork());
+
+        $workGroupCreated = $createGroupWork($dataToCreateGroupWorkFiltered->toArray());
+
+        return $workGroupCreated;
+    }
+
+    private function storeExam(Collection $dataToCreateExam): void
+    {
+        $dataToCreateExamFiltered = $this->filterDataToCreateExam($dataToCreateExam);
+
+        $createExam = new Create(new Exam());
+
+        $createExam($dataToCreateExamFiltered->toArray());
+    }
+
+    private function addDefaultMemberToGroupWork(): void
+    {
+        $addDefaultMemberGroupWork = new AddMemberToGroupWork($this->groupWork);
+
+        $authenticatedUser = auth()->user();
+
+        $addDefaultMemberGroupWork($authenticatedUser->getAuthIdentifier());
+    }
+
+    private function addMembersToGroupWork(Collection $dataToCreate): void
+    {
+
+        $dataToAddMemberToGroupWork =
+            $this->filterDataToAddMemberToGroupWork($dataToCreate);
+
+        if (($dataToAddMemberToGroupWork->count()) <= 0) {
+            return;
+        }
+
+        $addMemberToGroupWork = new AddMemberToGroupWork($this->groupWork);
+
+        $dataToAddMemberToGroupWork->each(fn ($member) => $addMemberToGroupWork($member['user_id']));
     }
 }

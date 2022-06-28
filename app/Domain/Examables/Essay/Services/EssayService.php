@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Domain\Examables\Essay\Services;
 
 use App\Domain\Examables\Essay\Models\Essay;
+use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use App\Support\Services\CrudModelOperationsService;
 use Domain\Exam\Models\Exam;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class EssayService extends CrudModelOperationsService
 {
@@ -44,39 +44,43 @@ class EssayService extends CrudModelOperationsService
      **/
     public function create(array $dataToCreate): Model
     {
-        $this->createEssay($this->filterDataToCreateEssay($dataToCreate));
+        $dataToCreateCollection = collect($dataToCreate);
 
-        $this->createExam($this->filterDataToCreateExam($dataToCreate));
+        $this->essay = $this->createEssay($dataToCreateCollection);
+
+        throw_if(is_null($this->essay), RegisterRecordFailException::class);
+
+        $this->createExam($dataToCreateCollection);
 
         return $this->essay;
     }
 
-    private function createEssay(array $dataToCreateEssay): void
+    private function createEssay(Collection $dataToCreateEssay): Essay
     {
-        $this->essay = Essay::create($dataToCreateEssay);
+        $dataToCreateEssay = $this->filterDataToCreateEssay($dataToCreateEssay);
+
+        $essayCreated = Essay::create($dataToCreateEssay->toArray());
+
+        return $essayCreated;
     }
 
-    private function createExam(array $dataToCreateExam): void
+    private function createExam(Collection $dataToCreateExam): void
     {
-        Exam::create($dataToCreateExam);
-    }
+        $dataToCreateExam = $this->filterDataToCreateExam($dataToCreateExam);
 
-    private function filterDataToCreate(array $dataToFilter, array $filter): array
-    {
-        return Arr::only($dataToFilter, $filter);
+        Exam::create($dataToCreateExam->toArray());
     }
-
-    private function filterDataToCreateEssay(array $dataToFilter): array
+    private function filterDataToCreateEssay(Collection $dataToFilter): Collection
     {
         $filter = [
             'topic',
             'observation'
         ];
-        return $this->filterDataToCreate($dataToFilter, $filter);
+        return $dataToFilter->only($filter);
     }
 
 
-    private function filterDataToCreateExam(array $dataToFilter): array
+    private function filterDataToCreateExam(Collection $dataToFilter): Collection
     {
         $filter = [
 
@@ -86,10 +90,10 @@ class EssayService extends CrudModelOperationsService
             'examable_type',
         ];
 
-        $dataToFilter = Arr::add($dataToFilter, 'examable_id', $this->essay->id);
-        $dataToFilter = Arr::add($dataToFilter, 'examable_type', $this->essay::class);
+        $dataToFilter->put('examable_id', $this->essay->id);
+        $dataToFilter->put('examable_type', $this->essay::class);
 
 
-        return $this->filterDataToCreate($dataToFilter, $filter);
+        return $dataToFilter->only($filter);
     }
 }

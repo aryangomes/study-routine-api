@@ -29,4 +29,13 @@ class MemberFactory extends Factory
             'user_id' => User::factory()->create(),
         ];
     }
+
+    public function withoutGroupWork()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'user_id' => User::factory()->create(),
+            ];
+        });
+    }
 }
