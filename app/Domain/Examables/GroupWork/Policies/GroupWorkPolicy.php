@@ -4,6 +4,7 @@ namespace App\Domain\Examables\GroupWork\Policies;
 
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Support\Policies\BasePolicy;
+use Domain\Subject\Models\Subject;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
@@ -47,11 +48,16 @@ class GroupWorkPolicy extends BasePolicy
      * Determine whether the user can create models.
      *
      * @param  \Domain\User\Models\User  $user
+     * @param  int  $subjectId
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, int $subjectId)
     {
-        //
+        $subject = Subject::find($subjectId);
+
+        $userId = $subject->user_id;
+
+        return $this->userCanCreateThisModel($user, $userId);
     }
 
     /**
@@ -150,16 +156,5 @@ class GroupWorkPolicy extends BasePolicy
     {
         $userId = $model->exam->subject->user_id;
         return $userId;
-    }
-
-    protected function userCanDoThisActionWithThisModel(User $user, string $userId, string $actionName): Response
-    {
-        $userCanDoThisActionWithThisModel =  ($user->id === $userId) ?
-
-            $this->allow() : $this->deny(__("policies.group_work.{$actionName}", [
-                'record' => $this->recordName
-            ]));
-
-        return $userCanDoThisActionWithThisModel;
     }
 }

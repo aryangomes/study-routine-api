@@ -24,6 +24,7 @@ class HomeworkControllerTest extends TestCase
         UserCanAccessThisRoute;
 
     private User $user;
+    private Subject $subject;
     private Homework $homework;
 
     protected function setUp(): void
@@ -34,7 +35,9 @@ class HomeworkControllerTest extends TestCase
 
         $this->homework = Homework::first();
 
-        $this->user = $this->homework->subject->user;
+        $this->subject = $this->homework->subject;
+
+        $this->user = $this->subject->user;
 
         $this->withMiddleware(['auth:sanctum', 'verified']);
 
@@ -53,7 +56,14 @@ class HomeworkControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
-        $dataToCreateHomework = Homework::factory()->make()->toArray();
+        $subject = Subject::factory()->create([
+            'user_id' => $this->user
+        ]);
+
+        $dataToCreateHomework = Homework::factory()->make([
+            'subject_id' => $this->subject
+        ])->toArray();
+
 
         $response = $this->postJson(
             route('homeworks.store'),
@@ -75,6 +85,10 @@ class HomeworkControllerTest extends TestCase
     public function create_a_homework_should_fail_because_invalid_data($dataToCreateHomework)
     {
         Sanctum::actingAs($this->user);
+
+        $dataToCreateHomework = collect($dataToCreateHomework);
+
+        $dataToCreateHomework = $dataToCreateHomework->toArray();
 
         $response = $this->postJson(
             route('homeworks.store'),
@@ -253,10 +267,11 @@ class HomeworkControllerTest extends TestCase
     {
 
         $defaultData = [
-            'subject_id' => 1,
+
             'title' => 'title',
             'observation' => 'observation',
             'due_date' => Carbon::now()->addDays(7),
+            'subject_id' => 1,
         ];
 
         $collectionDefaultData = collect($defaultData);

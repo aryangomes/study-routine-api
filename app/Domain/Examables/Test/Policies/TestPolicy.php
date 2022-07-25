@@ -46,11 +46,16 @@ class TestPolicy extends BasePolicy
      * Determine whether the user can create models.
      *
      * @param  \Domain\User\Models\User  $user
+     * @param  int  $subjectId
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user, Subject $subject)
+    public function create(User $user, int $subjectId)
     {
-        return $this->userCanCreateThisModel($user, $subject->user_id);
+        $subject = Subject::find($subjectId);
+
+        $userId = $subject->user_id;
+
+        return $this->userCanCreateThisModel($user, $userId);
     }
 
     /**

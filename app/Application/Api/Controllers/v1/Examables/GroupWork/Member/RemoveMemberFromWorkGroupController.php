@@ -30,6 +30,10 @@ class RemoveMemberFromWorkGroupController extends GroupWorkController
             abort(Response::HTTP_NOT_FOUND, __('member.remove_member_errors.member_not_found'));
         }
 
+        if ($member->group_work_id !== $groupWork->id) {
+            abort(Response::HTTP_FORBIDDEN, __('member.remove_member_errors.member_does_not_belong_to_this_group'));
+        }
+
         if ($member->isOwnerOfGroupWork) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, __('member.remove_member_errors.member_is_owner'));
         }

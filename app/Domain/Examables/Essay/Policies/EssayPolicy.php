@@ -4,6 +4,7 @@ namespace App\Domain\Examables\Essay\Policies;
 
 use App\Domain\Examables\Essay\Models\Essay;
 use App\Support\Policies\BasePolicy;
+use Domain\Subject\Models\Subject;
 use Domain\User\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Database\Eloquent\Model;
@@ -46,12 +47,14 @@ class EssayPolicy extends BasePolicy
      * Determine whether the user can create models.
      *
      * @param  \Domain\User\Models\User  $user
+     * @param  int $subjectId
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, int $subjectId)
     {
-
-        return $this->userCanCreateThisModel($user, $user->id);
+        $subject = Subject::find($subjectId);
+        $userId = $subject->user_id;
+        return $this->userCanCreateThisModel($user, $userId);
     }
 
     /**

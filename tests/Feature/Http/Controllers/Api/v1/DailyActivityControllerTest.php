@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use App\Application\Api\Resources\DailyActivity\DailyActivityCollection;
+use Domain\Subject\Models\Subject;
 
 class DailyActivityControllerTest extends TestCase
 {
@@ -83,11 +84,36 @@ class DailyActivityControllerTest extends TestCase
      * @test
      *
      */
-    public function create_a_daily_activity_should_fail_because_invalid_data($dataToCreateDailyActivity)
+    public function create_a_daily_activity_should_fail_because_invalid_data($invalidatedDataToCreateDailyActivity)
     {
         Sanctum::actingAs($this->user);
 
         $this->seed(DailyActivityTestSeeder::class);
+
+        $response = $this->postJson(
+            route('dailyActivities.store'),
+            $invalidatedDataToCreateDailyActivity
+        );
+
+        $response->assertUnprocessable();
+    }
+
+    /**
+     * 
+     * @test
+     *
+     */
+    public function create_a_daily_activity_should_fail_because_activity_is_a_daily_activity_already()
+    {
+        Sanctum::actingAs($this->user);
+
+        $this->seed(DailyActivityTestSeeder::class);
+
+        $dataToCreateDailyActivity =
+            DailyActivity::factory()->homework()->make([
+                'activitable_type' => $this->dailyActivity->activitable_type,
+                'activitable_id' => $this->dailyActivity->activitable_id
+            ])->toArray();
 
         $response = $this->postJson(
             route('dailyActivities.store'),
@@ -174,7 +200,7 @@ class DailyActivityControllerTest extends TestCase
         $response->assertOk();
 
         $this->assertEquals(
-            $dataFromResponse[0]->activitable->subject->user_id,
+            Subject::find($dataFromResponse[0]->activity->subject->id)->user_id,
             $this->user->id
         );
 

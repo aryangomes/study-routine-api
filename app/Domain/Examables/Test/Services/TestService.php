@@ -29,7 +29,7 @@ class TestService extends CrudModelOperationsService
     {
         $user = auth()->user();
 
-        $getAll  = Test::ofUser($user)->get();
+        $getAll  = Test::ofUser($user)->latest()->get();
 
         return $getAll;
     }

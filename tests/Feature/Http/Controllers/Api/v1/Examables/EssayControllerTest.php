@@ -46,9 +46,9 @@ class EssayControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
-
-
-        $dataToCreateExam = Exam::factory()->make()->toArray();
+        $dataToCreateExam = Exam::factory()->make([
+            'subject_id' => $this->user->subjects[0]
+        ])->toArray();
         $dataToCreateEssay =
             Essay::factory()->make([
                 'subject_id'
@@ -69,7 +69,7 @@ class EssayControllerTest extends TestCase
 
     /**
      *
-     * @dataProvider invalidatedDataToCreateHomeWork
+     * @dataProvider invalidatedDataToCreateEssay
      * 
      * @test
      *
@@ -261,7 +261,7 @@ class EssayControllerTest extends TestCase
 
     //PROVIDERS
 
-    public function invalidatedDataToCreateHomeWork(): array
+    public function invalidatedDataToCreateEssay(): array
     {
 
         $defaultData = [
@@ -275,7 +275,7 @@ class EssayControllerTest extends TestCase
 
 
 
-        $invalidatedDataToCreateHomeWork = [
+        $invalidatedDataToCreateEssay = [
             'Subject id is missing' => [
                 $collectionDefaultData->forget('subject_id')->toArray()
             ],
@@ -300,7 +300,7 @@ class EssayControllerTest extends TestCase
             ],
         ];
 
-        return $invalidatedDataToCreateHomeWork;
+        return $invalidatedDataToCreateEssay;
     }
 
 

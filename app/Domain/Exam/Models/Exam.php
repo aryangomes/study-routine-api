@@ -2,6 +2,7 @@
 
 namespace Domain\Exam\Models;
 
+use App\Domain\DailyActivity\Models\DailyActivity;
 use Carbon\Carbon;
 use Database\Factories\ExamFactory;
 use DateTime;
@@ -10,6 +11,7 @@ use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Notifications\Notifiable;
 
@@ -100,10 +102,21 @@ class Exam extends Model
      */
     public function scopeOfUser($query, User $user)
     {
-        return $query
-            ->with('exam', 'exam.subject')
-            ->whereHas('exam.subject', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id);
+
+        return
+            $query->with('exam.subject')->whereHas('exam.subject', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
             });
+    }
+
+    /**
+     * Get Exam's daily activity
+     * 
+     * @return MorphOne
+     */
+
+    public function dailyActivity(): MorphOne
+    {
+        return $this->morphOne(DailyActivity::class, 'activitable');
     }
 }

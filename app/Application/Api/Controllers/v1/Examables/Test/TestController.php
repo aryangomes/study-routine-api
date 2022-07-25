@@ -40,8 +40,8 @@ class TestController extends Controller
     public function store(StoreTestRequest $request)
     {
         $validatedData = $request->validated();
-        $subject = Subject::find($validatedData['subject_id']);
-        $this->authorize('createAExam', $subject);
+
+        $this->authorize('create', [Test::class, $validatedData['subject_id']]);
 
         $testCreated = $this->examTestService->create($validatedData);
 

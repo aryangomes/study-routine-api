@@ -41,9 +41,7 @@ class GroupWorkController extends BaseApiController
 
         $validatedData = $request->validated();
 
-        $subject = Subject::find($validatedData['subject_id']);
-
-        $this->authorize('createAExam', $subject);
+        $this->authorize('create', [GroupWork::class, $validatedData['subject_id']]);
 
         $groupWorkCreated = $this->groupWorkService->create($validatedData);
 

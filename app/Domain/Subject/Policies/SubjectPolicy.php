@@ -101,17 +101,6 @@ class SubjectPolicy extends BasePolicy
         //
     }
 
-    /**
-     * Determine whether the user can create a Exam.
-     *
-     * @param  \Domain\User\Models\User  $user
-     * @param  \Domain\Subject\Models\Subject $subject
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function createAExam(User $user, Subject $subject)
-    {
-        return $this->userCanCreateThisModel($user, $subject->user_id);
-    }
 
     /**
      *

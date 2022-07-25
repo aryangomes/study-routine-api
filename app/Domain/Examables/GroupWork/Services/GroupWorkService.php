@@ -31,7 +31,7 @@ class GroupWorkService extends CrudModelOperationsService
     {
         $authenticatedUser = auth()->user();
 
-        $getAll  = GroupWork::ofUser($authenticatedUser)->orderBy('created_at', 'desc')->get();
+        $getAll  = GroupWork::ofUser($authenticatedUser)->latest()->get();
 
         return $getAll;
     }
