@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -56,9 +57,6 @@ class HomeworkControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
-        $subject = Subject::factory()->create([
-            'user_id' => $this->user
-        ]);
 
         $dataToCreateHomework = Homework::factory()->make([
             'subject_id' => $this->subject
@@ -158,8 +156,7 @@ class HomeworkControllerTest extends TestCase
 
         $response = $this->getJson(
             route(
-                'homeworks.index',
-                ['homework' => $this->homework]
+                'homeworks.index'
             )
         );
 
@@ -169,6 +166,88 @@ class HomeworkControllerTest extends TestCase
         $response->assertOk();
 
         $this->assertEquals($this->homework->id, $dataFromResponse[0]->id);
+    }
+
+    /**
+     *
+     * @dataProvider queryParametersToFilterHomeworks
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_homeworks_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+        if ($key == 'subject_id') {
+            $attributes = [
+                $key => $value
+            ];
+        } else {
+            $attributes = [
+                $key => $value,
+                'subject_id' => $this->homework->subject_id
+            ];
+        }
+
+        Homework::factory()->create($attributes);
+
+        $response = $this->getJson(
+            route(
+                'homeworks.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
+    /**
+     *
+     * @test
+     *
+     */
+    public function get_filtered_users_by_between_due_date_homeworks_successfully()
+    {
+
+        Sanctum::actingAs($this->user);
+
+        $homework = Homework::factory()->create([
+            'subject_id' => $this->homework->subject_id,
+        ]);
+
+        $today = Carbon::today();
+
+        $response = $this->getJson(
+            route(
+                'homeworks.index',
+                [
+                    'start_due_date' => $today,
+                    'end_due_date' => $today->addDays(15),
+                ]
+            )
+        );
+
+        $response->assertOk();
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+
+                $json->where(
+                    '1.due_date',
+                    $homework->due_date->format('Y-m-d')
+                )
+
+            );
     }
 
 
@@ -325,7 +404,7 @@ class HomeworkControllerTest extends TestCase
             'New due date' => [
                 [
                     'due_date' =>
-                    Carbon::now()->addDays(8),
+                    Carbon::today()->addDays(8),
                 ], 'due_date'
             ],
         ];
@@ -365,6 +444,20 @@ class HomeworkControllerTest extends TestCase
         ];
 
         return $invalidatedDataToUpdateHomework;
+    }
+
+    public function queryParametersToFilterHomeworks()
+    {
+        return [
+            'Query Parameter: subject_id' => [
+                'subject_id', 1, '0.subject.id',
+
+            ],
+            'Query Parameter: due_date' =>
+            ['due_date', date('Y-m-d'), '0.due_date'],
+            'Query Parameter: title' =>
+            ['title', 'some title', '0.title']
+        ];
     }
 
 

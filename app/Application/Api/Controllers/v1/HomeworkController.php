@@ -24,9 +24,17 @@ class HomeworkController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->homeworkService->getAll();
+
+
+        if (empty($request->query())) {
+            $collection = $this->homeworkService->getAll();
+        } else {
+            $collection = $this->homeworkService
+                ->getRecordsFilteredByQuery($request);
+        }
+
 
         return response()->json(new HomeworkCollection($collection));
     }
