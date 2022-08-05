@@ -6,16 +6,16 @@ use App\Domain\DailyActivity\Models\DailyActivity;
 use App\Support\Traits\UserCanAccessThisRoute;
 use Carbon\Carbon;
 use Database\Seeders\Tests\DailyActivityTestSeeder;
-use Database\Seeders\Tests\Examables\TestSeederTest;
 use Domain\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
-use App\Application\Api\Resources\DailyActivity\DailyActivityCollection;
+use App\Domain\Homework\Models\Homework;
+use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class DailyActivityControllerTest extends TestCase
 {
@@ -208,6 +208,137 @@ class DailyActivityControllerTest extends TestCase
             $dataFromResponse[0]->date_of_activity,
             date('Y-m-d')
         );
+    }
+
+    /**
+     *
+     * @dataProvider queryParametersToFilterDailyActivities
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_daily_activities_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+
+        $attributes = [
+            'activitable_id' => Homework::factory([
+                'subject_id' => $this->user->subjects[0]->id
+            ])
+        ];
+
+
+        if ($key === 'subject_id') {
+            $attributes = [
+                'activitable_id' => Homework::factory([
+                    'subject_id' => $value
+                ])
+            ];
+        } else {
+            $attributes = [
+                'activitable_id' => Homework::factory([
+                    'subject_id' => $this->user->subjects[0]->id
+                ])
+            ];
+        }
+
+
+        if ($key !== 'activitable_type' && $key !== 'subject_id') {
+            $attributes = Arr::add($attributes, $key, $value);
+        }
+
+
+        DailyActivity::factory()->homework()->create($attributes);
+
+
+        $response = $this->getJson(
+            route(
+                'dailyActivities.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
+
+    /**
+     *
+     * @dataProvider queryParametersToFilterDailyActivitiesByActivitableType
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_daily_activities_by_activitable_type_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+
+        if ($value === 'exam') {
+
+            DailyActivity::factory()->exam()->create([
+                'activitable_id' => Exam::factory([
+                    'subject_id' => $this->user->subjects[0]->id
+                ])->essay()
+            ]);
+        } else {
+            DailyActivity::factory()->homework()->create([
+                'activitable_id' => Homework::factory([
+                    'subject_id' => $this->user->subjects[0]->id
+                ])
+            ]);
+        }
+
+
+
+        $response = $this->getJson(
+            route(
+                'dailyActivities.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
+    /**
+     *
+     * 
+     * @test
+     *
+     */
+    public function get_daily_activity_types_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $response = $this->getJson(
+            route(
+                'dailyActivities.activitables'
+            )
+        );
+
+        $response->assertOk();
+
+        $response->assertJsonCount(count(DailyActivity::getActivitables()));
+
+        $response->assertJson(array_keys(DailyActivity::getActivitables()));
     }
 
 
@@ -462,6 +593,33 @@ class DailyActivityControllerTest extends TestCase
 
 
         return $invalidatedDataToUpdateDailyActivity;
+    }
+
+    public function queryParametersToFilterDailyActivitiesByActivitableType()
+    {
+        return [
+
+            'Query Parameter: activitable_type = homework ' =>
+            ['activitable_type', 'homework', '0.activitable_type'],
+            'Query Parameter: activitable_type = exam ' =>
+            ['activitable_type', 'exam', '0.activitable_type'],
+
+        ];
+    }
+
+    public function queryParametersToFilterDailyActivities()
+    {
+        return [
+
+            'Query Parameter: date_of_activity' =>
+            ['date_of_activity', date('Y-m-d'), '0.date_of_activity'],
+            'Query Parameter: start_time' =>
+            ['start_time', date('09:00:00'), '0.start_time'],
+            'Query Parameter: end_time' =>
+            ['end_time', date('10:00:00'), '0.end_time'],
+            'Query Parameter: subject_id' =>
+            ['subject_id', 1, '0.activity.subject.id'],
+        ];
     }
 
 
