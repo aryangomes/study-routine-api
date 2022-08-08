@@ -6,6 +6,14 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class EssayCollection extends ResourceCollection
 {
+
+    /**
+     * The resource that this resource collects.
+     *
+     * @var string
+     */
+    public $collects = EssayResource::class;
+
     /**
      * Transform the resource collection into an array.
      *

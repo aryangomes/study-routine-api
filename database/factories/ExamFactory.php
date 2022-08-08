@@ -40,13 +40,13 @@ class ExamFactory extends Factory
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public function test()
+    public function test(array $testAttributes = [])
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes) use ($testAttributes) {
 
             return [
                 'examable_type' => Test::class,
-                'examable_id' => Test::factory()->create(),
+                'examable_id' => Test::factory()->create($testAttributes),
                 'subject_id' => $attributes['subject_id'],
                 'effective_date' => $attributes['effective_date'],
             ];
@@ -58,13 +58,13 @@ class ExamFactory extends Factory
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public function groupWork()
+    public function groupWork(array $groupWorkAttributes = [])
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function (array $attributes) use ($groupWorkAttributes) {
 
             return [
                 'examable_type' => GroupWork::class,
-                'examable_id' => GroupWork::factory()->create(),
+                'examable_id' => GroupWork::factory()->create($groupWorkAttributes),
                 'subject_id' => $attributes['subject_id'],
                 'effective_date' => $attributes['effective_date'],
             ];
@@ -76,13 +76,14 @@ class ExamFactory extends Factory
      *
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    public function essay()
+    public function essay(array $essayAttributes = [])
     {
-        return $this->state(function (array $attributes) {
+
+        return $this->state(function (array $attributes) use ($essayAttributes) {
 
             return [
                 'examable_type' => Essay::class,
-                'examable_id' => Essay::factory()->create(),
+                'examable_id' => Essay::factory()->create($essayAttributes),
                 'subject_id' => $attributes['subject_id'],
                 'effective_date' => $attributes['effective_date'],
 

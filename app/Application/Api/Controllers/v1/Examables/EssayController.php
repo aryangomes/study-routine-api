@@ -24,9 +24,14 @@ class EssayController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->essayService->getAll();
+        if (empty($request->query())) {
+            $collection = $this->essayService->getAll();
+        } else {
+            $collection = $this->essayService
+                ->getRecordsFilteredByQuery($request);
+        }
 
         return response()->json(new EssayCollection($collection));
     }
