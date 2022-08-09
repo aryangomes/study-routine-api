@@ -11,6 +11,7 @@ use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Domain\Examables\GroupWork\Services\GroupWorkService;
 use Domain\Subject\Models\Subject;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 
 class GroupWorkController extends BaseApiController
 {
@@ -23,10 +24,16 @@ class GroupWorkController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->groupWorkService->getAll();
 
+
+        if (empty($request->query())) {
+            $collection = $this->groupWorkService->getAll();
+        } else {
+            $collection = $this->groupWorkService
+                ->getRecordsFilteredByQuery($request);
+        }
         return response()->json(new GroupWorkCollection($collection));
     }
 
