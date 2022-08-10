@@ -2,9 +2,9 @@
 
 namespace App\Application\Api\Resources\Examables\Test;
 
-use App\Application\Api\Resources\Exam\ExamResource;
 use App\Application\Api\Resources\Examables\Test\Topic\TopicResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Application\Api\Resources\Exam\ExamableResource;
 
 class TestResource extends JsonResource
 {
@@ -18,8 +18,8 @@ class TestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'exam' => new ExamResource($this->exam),
             'topics' => TopicResource::collection($this->topics),
+            'exam' => new ExamableResource($this->exam),
         ];
     }
 }

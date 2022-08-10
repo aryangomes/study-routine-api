@@ -11,6 +11,7 @@ use App\Domain\Examables\Test\Models\Test;
 use Domain\Subject\Models\Subject;
 use Domain\Examables\Test\Services\TestService;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
@@ -24,9 +25,14 @@ class TestController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->examTestService->getAll();
+        if (empty($request->query())) {
+            $collection = $this->examTestService->getAll();
+        } else {
+            $collection = $this->examTestService
+                ->getRecordsFilteredByQuery($request);
+        }
 
         return response()->json(new TestCollection($collection));
     }
