@@ -12,6 +12,8 @@ use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Domain\Exam\Actions\FilterExamBySubject;
+use Domain\Exam\Actions\FilterExamByEffectiveDate;
 
 class TestService extends CrudModelOperationsService
 {
@@ -87,31 +89,20 @@ class TestService extends CrudModelOperationsService
 
         $user = auth()->user();
 
-
         $subjectId = $request->subject_id;
+
         $effectiveDate = $request->effective_date;
+
         $name = $request->name;
 
         $query = $this->model::query()
             ->ofUser($user)
             ->when($subjectId, function ($query, $subjectId) {
-                return  $query->whereHas(
-                    'exam',
-                    function ($query) use ($subjectId) {
-
-                        $query->with('exam.subject')->where('subject_id', $subjectId);
-                    }
-                );
+                return FilterExamBySubject::filter($query, $subjectId);
             })
 
             ->when($effectiveDate, function ($query, $effectiveDate) {
-                return  $query->whereHas(
-                    'exam',
-                    function ($query) use ($effectiveDate) {
-
-                        $query->whereDate('effective_date', $effectiveDate);
-                    }
-                );
+                return FilterExamByEffectiveDate::filter($query, $effectiveDate);
             })
             ->when($name, function ($query, $name) {
                 return  $query->whereHas(

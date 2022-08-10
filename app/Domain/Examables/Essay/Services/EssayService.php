@@ -7,10 +7,12 @@ namespace App\Domain\Examables\Essay\Services;
 use App\Domain\Examables\Essay\Models\Essay;
 use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use App\Support\Services\CrudModelOperationsService;
+use Domain\Exam\Actions\FilterExamBySubject;
 use Domain\Exam\Models\Exam;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Domain\Exam\Actions\FilterExamByEffectiveDate;
 
 class EssayService extends CrudModelOperationsService
 {
@@ -84,19 +86,20 @@ class EssayService extends CrudModelOperationsService
         $user = auth()->user();
 
         $subjectId = $request->subject_id;
+
         $topic = $request->topic;
+
         $observation = $request->observation;
+
+        $effectiveDate = $request->effective_date;
 
         $query = $this->model::query()
             ->ofUser($user)
             ->when($subjectId, function ($query, $subjectId) {
-                return  $query->whereHas(
-                    'exam',
-                    function ($query) use ($subjectId) {
-
-                        $query->with('exam.subject')->where('subject_id', $subjectId);
-                    }
-                );
+                return FilterExamBySubject::filter($query, $subjectId);
+            })
+            ->when($effectiveDate, function ($query, $effectiveDate) {
+                return FilterExamByEffectiveDate::filter($query, $effectiveDate);
             })
             ->when($topic, function ($query, $topic) {
                 $lowerTopic = strtolower($topic);

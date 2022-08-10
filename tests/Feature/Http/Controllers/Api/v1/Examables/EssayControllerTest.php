@@ -182,10 +182,11 @@ class EssayControllerTest extends TestCase
 
         Sanctum::actingAs($this->user);
 
-        if ($key == 'subject_id') {
+        if (in_array($key, ['subject_id', 'effective_date'])) {
 
             $essay = Exam::factory()->essay()->create([
-                $key => $value
+                $key => $value,
+                'subject_id' => 1
             ]);
         } else {
             $attributes = [
@@ -208,6 +209,7 @@ class EssayControllerTest extends TestCase
         );
 
         $response->assertOk();
+
 
 
         $response
@@ -418,6 +420,10 @@ class EssayControllerTest extends TestCase
         return [
             'Query Parameter: subject_id' => [
                 'subject_id', 1, '0.exam.subject.id',
+
+            ],
+            'Query Parameter: effective_date' => [
+                'effective_date', date('Y-m-d'), '0.exam.effective_date',
 
             ],
             'Query Parameter: topic' => [

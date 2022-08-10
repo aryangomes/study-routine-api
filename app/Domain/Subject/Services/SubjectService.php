@@ -69,7 +69,8 @@ class SubjectService extends CrudModelOperationsService
         $query = $this->model::query()
             ->where('user_id', $user->id)
             ->when($name, function ($query, $name) {
-                return $query->where('name', 'like', "%$name%");
+                $lowerName = strtolower($name);
+                return $query->whereRaw('LOWER(name) LIKE ?', ["%$lowerName%"]);
             });
 
         $collection = $query->get();

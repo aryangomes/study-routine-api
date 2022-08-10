@@ -56,7 +56,8 @@ class HomeworkService extends CrudModelOperationsService
                 return $query->where('subject_id', $subjectId);
             })
             ->when($title, function ($query, $title) {
-                return $query->where('title', 'like', "%$title%");
+                $lowerTitle = strtolower($title);
+                return $query->whereRaw('LOWER(title) LIKE ?', ["%$lowerTitle%"]);
             })
             ->when($dueDate, function ($query, $dueDate) {
 

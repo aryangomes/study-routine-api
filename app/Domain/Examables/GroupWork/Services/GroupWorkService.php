@@ -3,14 +3,14 @@
 
 namespace App\Domain\Examables\GroupWork\Services;
 
-use App\Domain\Exam\Actions\CreateExam;
 use App\Domain\Examables\GroupWork\Member\Actions\AddMemberToGroupWork;
 use App\Domain\Examables\GroupWork\Models\GroupWork;
 use App\Support\Actions\CrudModelOperations\Create;
 use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use App\Support\Services\CrudModelOperationsService;
+use Domain\Exam\Actions\FilterExamByEffectiveDate;
+use Domain\Exam\Actions\FilterExamBySubject;
 use Domain\Exam\Models\Exam;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -82,32 +82,22 @@ class GroupWorkService extends CrudModelOperationsService
 
         $user = auth()->user();
 
-
         $subjectId = $request->subject_id;
+
         $effectiveDate = $request->effective_date;
+
         $topic = $request->topic;
+
         $note = $request->note;
 
         $query = $this->model::query()
             ->ofUser($user)
             ->when($subjectId, function ($query, $subjectId) {
-                return  $query->whereHas(
-                    'exam',
-                    function ($query) use ($subjectId) {
-
-                        $query->with('exam.subject')->where('subject_id', $subjectId);
-                    }
-                );
+                return FilterExamBySubject::filter($query, $subjectId);
             })
 
             ->when($effectiveDate, function ($query, $effectiveDate) {
-                return  $query->whereHas(
-                    'exam',
-                    function ($query) use ($effectiveDate) {
-
-                        $query->whereDate('effective_date', $effectiveDate);
-                    }
-                );
+                return FilterExamByEffectiveDate::filter($query, $effectiveDate);
             })
             ->when($topic, function ($query, $topic) {
                 $lowerTopic = strtolower($topic);
