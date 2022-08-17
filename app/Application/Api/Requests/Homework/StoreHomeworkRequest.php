@@ -2,6 +2,7 @@
 
 namespace App\Application\Api\Requests\Homework;
 
+use Domain\Subject\Models\Subject;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreHomeworkRequest extends FormRequest

@@ -19,7 +19,7 @@ class HomeworkResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'observation' => $this->observation,
-            'due_date' => $this->due_date,
+            'due_date' => $this->due_date->format('Y-m-d'),
             'subject' => new SubjectResource($this->subject),
         ];
     }

@@ -11,6 +11,9 @@ use App\Domain\Examables\Test\Models\Test;
 use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
+use Domain\Exam\Actions\FilterExamBySubject;
+use Domain\Exam\Actions\FilterExamByEffectiveDate;
 
 class TestService extends CrudModelOperationsService
 {
@@ -29,7 +32,7 @@ class TestService extends CrudModelOperationsService
     {
         $user = auth()->user();
 
-        $getAll  = Test::ofUser($user)->get();
+        $getAll  = Test::ofUser($user)->latest()->get();
 
         return $getAll;
     }
@@ -73,6 +76,47 @@ class TestService extends CrudModelOperationsService
         );
 
         return $test;
+    }
+
+    /**
+     * Get filtered records by query parameters in the database
+     *
+     * 
+     * @return Collection
+     **/
+    public function getRecordsFilteredByQuery(Request $request): Collection
+    {
+
+        $user = auth()->user();
+
+        $subjectId = $request->subject_id;
+
+        $effectiveDate = $request->effective_date;
+
+        $name = $request->name;
+
+        $query = $this->model::query()
+            ->ofUser($user)
+            ->when($subjectId, function ($query, $subjectId) {
+                return FilterExamBySubject::filter($query, $subjectId);
+            })
+
+            ->when($effectiveDate, function ($query, $effectiveDate) {
+                return FilterExamByEffectiveDate::filter($query, $effectiveDate);
+            })
+            ->when($name, function ($query, $name) {
+                return  $query->whereHas(
+                    'topics',
+                    function ($query) use ($name) {
+
+                        $lowerName = strtolower($name);
+                        return $query->whereRaw('LOWER(name) LIKE ?', ["%$lowerName%"]);
+                    }
+                );
+            });
+        $collection = $query->get();
+
+        return $collection;
     }
 
     private function filterDataToCreateExam(Collection $dataToCreate): Collection

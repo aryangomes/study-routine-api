@@ -10,6 +10,7 @@ use App\Application\Api\Resources\Subject\SubjectResource;
 use Domain\Subject\Models\Subject;
 use Domain\Subject\Services\SubjectService;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
@@ -23,9 +24,16 @@ class SubjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->subjectService->getAll();
+
+
+        if (empty($request->query())) {
+            $collection = $this->subjectService->getAll();
+        } else {
+            $collection = $this->subjectService
+                ->getRecordsFilteredByQuery($request);
+        }
 
         return response()->json(new SubjectCollection($collection));
     }

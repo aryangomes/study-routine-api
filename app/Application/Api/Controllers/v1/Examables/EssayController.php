@@ -9,6 +9,7 @@ use App\Application\Api\Resources\Examables\Essay\EssayCollection;
 use App\Application\Api\Resources\Examables\Essay\EssayResource;
 use App\Domain\Examables\Essay\Models\Essay;
 use App\Domain\Examables\Essay\Services\EssayService;
+use Domain\Subject\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -23,9 +24,14 @@ class EssayController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->essayService->getAll();
+        if (empty($request->query())) {
+            $collection = $this->essayService->getAll();
+        } else {
+            $collection = $this->essayService
+                ->getRecordsFilteredByQuery($request);
+        }
 
         return response()->json(new EssayCollection($collection));
     }
@@ -38,9 +44,12 @@ class EssayController extends BaseApiController
      */
     public function store(StoreEssayRequest $request)
     {
-        $this->authorize('create', new Essay());
 
         $validatedData = $request->validated();
+
+        $this->authorize('create',  [
+            Essay::class, $validatedData['subject_id']
+        ]);
 
         $essayCreated = $this->essayService->create($validatedData);
 

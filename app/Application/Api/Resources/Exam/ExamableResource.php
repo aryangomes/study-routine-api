@@ -17,9 +17,8 @@ class ExamableResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'effective_date' => $this->effective_date,
+            'effective_date' => $this->effective_date->format('Y-m-d'),
             'subject' => new SubjectResource($this->subject),
-            'examable' => $this->examable,
         ];
     }
 }

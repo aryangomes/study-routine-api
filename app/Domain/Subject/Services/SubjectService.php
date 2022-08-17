@@ -6,6 +6,7 @@ namespace Domain\Subject\Services;
 use Domain\Subject\Models\Subject;
 use App\Support\Services\CrudModelOperationsService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 class SubjectService extends CrudModelOperationsService
 {
@@ -49,5 +50,31 @@ class SubjectService extends CrudModelOperationsService
         $subjectCreated = $createAction($dataToCreate);
 
         return $subjectCreated;
+    }
+
+    /**
+     * Get filtered records by query parameters in the database
+     *
+     * 
+     * @return Collection
+     **/
+    public function getRecordsFilteredByQuery(Request $request): Collection
+    {
+
+        $user = auth()->user();
+
+        $name = $request->name;
+
+
+        $query = $this->model::query()
+            ->where('user_id', $user->id)
+            ->when($name, function ($query, $name) {
+                $lowerName = strtolower($name);
+                return $query->whereRaw('LOWER(name) LIKE ?', ["%$lowerName%"]);
+            });
+
+        $collection = $query->get();
+
+        return $collection;
     }
 }

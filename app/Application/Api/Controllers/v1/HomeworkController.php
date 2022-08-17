@@ -8,6 +8,7 @@ use App\Application\Api\Resources\Homework\HomeworkCollection;
 use App\Application\Api\Resources\Homework\HomeworkResource;
 use App\Domain\Homework\Models\Homework;
 use App\Domain\Homework\Services\HomeworkService;
+use Domain\Subject\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -23,9 +24,17 @@ class HomeworkController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->homeworkService->getAll();
+
+
+        if (empty($request->query())) {
+            $collection = $this->homeworkService->getAll();
+        } else {
+            $collection = $this->homeworkService
+                ->getRecordsFilteredByQuery($request);
+        }
+
 
         return response()->json(new HomeworkCollection($collection));
     }
@@ -38,9 +47,12 @@ class HomeworkController extends BaseApiController
      */
     public function store(StoreHomeworkRequest $request)
     {
-        $this->authorize('create', new HomeWork());
 
         $validatedData = $request->validated();
+
+        $this->authorize('create', [
+            HomeWork::class, $validatedData['subject_id']
+        ]);
 
         $homeworkCreated = $this->homeworkService->create($validatedData);
 

@@ -28,7 +28,7 @@ class HomeworkFactory extends Factory
             'title' => $this->faker->text(20),
             'observation' => $this->faker->realText(),
             'subject_id' => Subject::factory()->create(),
-            'due_date' => $this->faker->dateTimeBetween('now', '+15 days'),
+            'due_date' => $this->faker->dateTimeBetween('today', '+15 days'),
         ];
     }
 }

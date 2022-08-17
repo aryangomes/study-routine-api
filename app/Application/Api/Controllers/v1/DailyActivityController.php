@@ -23,9 +23,15 @@ class DailyActivityController extends BaseApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $collection = $this->dailyActivityService->getAll();
+
+        if (empty($request->query())) {
+            $collection = $this->dailyActivityService->getAll();
+        } else {
+            $collection = $this->dailyActivityService
+                ->getRecordsFilteredByQuery($request);
+        }
 
         return response()->json(new DailyActivityCollection($collection));
     }
@@ -102,5 +108,17 @@ class DailyActivityController extends BaseApiController
         return response()->json(
             status: Response::HTTP_NO_CONTENT
         );
+    }
+
+
+    /**
+     * 
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getActivitables()
+    {
+        $activitablesType = array_keys(DailyActivity::getActivitables());
+        return response()->json($activitablesType);
     }
 }

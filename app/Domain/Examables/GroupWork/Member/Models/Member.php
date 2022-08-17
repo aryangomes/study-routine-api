@@ -54,8 +54,21 @@ class Member extends Model
      */
     public function getIsOwnerOfGroupWorkAttribute(): bool
     {
-        $isOwnerOfGroupWork = ($this->groupWork->exam->subject->user_id ==
-            $this->user_id);
+
+        if (!isset($this->groupWork->exam)) {
+            return false;
+        }
+
+        $exam = $this->groupWork->exam;
+
+
+        if (!isset($exam->subject)) {
+            return false;
+        }
+
+        $subject = $exam->subject;
+
+        $isOwnerOfGroupWork = ($subject->user_id == $this->user_id);
 
         return $isOwnerOfGroupWork;
     }

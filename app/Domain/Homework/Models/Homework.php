@@ -2,12 +2,14 @@
 
 namespace App\Domain\Homework\Models;
 
+use App\Domain\DailyActivity\Models\DailyActivity;
 use Database\Factories\HomeworkFactory;
 use Domain\Subject\Models\Subject;
 use Domain\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Homework extends Model
 {
@@ -99,5 +101,16 @@ class Homework extends Model
             ->whereHas('subject', function ($query) use ($user) {
                 $query->where('user_id', '=', $user->id);
             });
+    }
+
+    /**
+     * Get Exam's daily activity
+     * 
+     * @return MorphOne
+     */
+
+    public function dailyActivity(): MorphOne
+    {
+        return $this->morphOne(DailyActivity::class, 'activitable');
     }
 }

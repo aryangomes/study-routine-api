@@ -4,8 +4,10 @@ namespace App\Domain\DailyActivity\Models;
 
 use App\Domain\Homework\Models\Homework;
 use Database\Factories\DailyActivityFactory;
+use DB;
 use Domain\Exam\Models\Exam;
 use Domain\User\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -78,11 +80,15 @@ class DailyActivity extends Model
     public function scopeOfUser($query, User $user)
     {
 
-        return $query
-            ->with('activitable.subject')
-            ->whereHas('activitable.subject', function ($query) use ($user) {
-                $query->where('user_id', '=', $user->id);
+        $userActivitables = $query
+            ->whereHas('activitable', function (Builder $query) use ($user) {
+                $userSubjects = $user->subjects()->select('id')->get(['id'])->toArray();
+
+                $query->with('activitable.subject')->whereIn('subject_id', $userSubjects);
             });
+
+
+        return $userActivitables;
     }
 
     /**

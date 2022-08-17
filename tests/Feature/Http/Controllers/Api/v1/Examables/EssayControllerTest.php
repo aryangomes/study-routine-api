@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -46,9 +47,9 @@ class EssayControllerTest extends TestCase
     {
         Sanctum::actingAs($this->user);
 
-
-
-        $dataToCreateExam = Exam::factory()->make()->toArray();
+        $dataToCreateExam = Exam::factory()->make([
+            'subject_id' => $this->user->subjects[0]
+        ])->toArray();
         $dataToCreateEssay =
             Essay::factory()->make([
                 'subject_id'
@@ -69,7 +70,7 @@ class EssayControllerTest extends TestCase
 
     /**
      *
-     * @dataProvider invalidatedDataToCreateHomeWork
+     * @dataProvider invalidatedDataToCreateEssay
      * 
      * @test
      *
@@ -169,6 +170,56 @@ class EssayControllerTest extends TestCase
         $this->assertEquals($this->essay->id, $dataFromResponse[0]->id);
     }
 
+    /**
+     *
+     * @dataProvider queryParametersToFilterEssays
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_essays_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+        if (in_array($key, ['subject_id', 'effective_date'])) {
+
+            $essay = Exam::factory()->essay()->create([
+                $key => $value,
+                'subject_id' => 1
+            ]);
+        } else {
+            $attributes = [
+                $key => $value,
+
+            ];
+            $essay = Exam::factory()->essay($attributes)->create([
+                'subject_id' => $this->user->subjects[0]->id
+            ]);
+        }
+
+
+
+
+        $response = $this->getJson(
+            route(
+                'essays.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
 
     /**
      *
@@ -261,7 +312,7 @@ class EssayControllerTest extends TestCase
 
     //PROVIDERS
 
-    public function invalidatedDataToCreateHomeWork(): array
+    public function invalidatedDataToCreateEssay(): array
     {
 
         $defaultData = [
@@ -275,7 +326,7 @@ class EssayControllerTest extends TestCase
 
 
 
-        $invalidatedDataToCreateHomeWork = [
+        $invalidatedDataToCreateEssay = [
             'Subject id is missing' => [
                 $collectionDefaultData->forget('subject_id')->toArray()
             ],
@@ -300,7 +351,7 @@ class EssayControllerTest extends TestCase
             ],
         ];
 
-        return $invalidatedDataToCreateHomeWork;
+        return $invalidatedDataToCreateEssay;
     }
 
 
@@ -364,6 +415,27 @@ class EssayControllerTest extends TestCase
         return $invalidatedDataToUpdateEssay;
     }
 
+    public function queryParametersToFilterEssays()
+    {
+        return [
+            'Query Parameter: subject_id' => [
+                'subject_id', 1, '0.exam.subject.id',
+
+            ],
+            'Query Parameter: effective_date' => [
+                'effective_date', date('Y-m-d'), '0.exam.effective_date',
+
+            ],
+            'Query Parameter: topic' => [
+                'topic', 'Some topic', '0.topic',
+
+            ],
+            'Query Parameter: observation' => [
+                'observation', 'Some observation', '0.observation',
+
+            ],
+        ];
+    }
 
 
     public function routesResourceWithAuthentication(): array

@@ -11,7 +11,6 @@ use Domain\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
-use Tests\Feature\Http\Controllers\Api\v1\GroupWorkControllerTest;
 use Tests\TestCase;
 
 /**
@@ -79,14 +78,12 @@ class RemoveMemberFromGroupWorkControllerTest extends TestCase
             ]
         );
 
-
         $response = $this->deleteJson(
             route('members.remove_member', [
                 'groupWork' => $examGroupWork,
                 'member' => $memberToRemove,
             ])
         );
-
 
         $response->assertNoContent();
 
@@ -134,16 +131,21 @@ class RemoveMemberFromGroupWorkControllerTest extends TestCase
             $dataToCreateGroupWork
         );
 
+        $groupWork = $response->getData();
 
-        $member = Member::where('user_id', $this->user->id)->first();
+        $member = Member::factory([
+            'group_work_id' => $groupWork->id,
+            'user_id' => $this->user->id,
+        ])->createOne();
 
 
         $response = $this->deleteJson(
             route('members.remove_member', [
-                'groupWork' => $this->examGroupWork->id,
+                'groupWork' => $groupWork->id,
                 'member' =>  $member->id,
             ])
         );
+
 
         $response->assertUnprocessable();
     }

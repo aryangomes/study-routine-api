@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class TestControllerTest extends TestCase
 {
@@ -163,6 +164,59 @@ class TestControllerTest extends TestCase
     }
 
     /**
+     *
+     * @dataProvider queryParametersToFilterTests
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_tests_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+        if (in_array($key, ['subject_id', 'effective_date'])) {
+
+            Exam::factory()->test()->create([
+                $key => $value,
+                'subject_id' => 1
+            ]);
+        } else {
+
+
+            $examTest = Test::factory()->create();
+            Topic::factory()->withTest()
+                ->create([
+                    $key => $value,
+                    'test_id' => $examTest
+                ]);
+
+            Exam::factory()->test()->create([
+                'subject_id' => $this->subject,
+                'examable_id' =>    $examTest->id,
+            ]);
+        }
+
+
+
+        $response = $this->getJson(
+            route(
+                'tests.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
+    /**
      * 
      * @test
      */
@@ -298,6 +352,22 @@ class TestControllerTest extends TestCase
             ],
 
 
+        ];
+    }
+
+    public function queryParametersToFilterTests()
+    {
+        return [
+            'Query Parameter: subject_id' => [
+                'subject_id', 1, '0.exam.subject.id',
+
+            ],
+            'Query Parameter: effective_date' => [
+                'effective_date', date('Y-m-d'), '0.exam.effective_date',
+
+            ],
+            'Query Parameter: test topic' =>
+            ['name', 'A Topic', '0.topics.0.name'],
         ];
     }
 

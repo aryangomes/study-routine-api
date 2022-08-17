@@ -7,9 +7,12 @@ namespace App\Domain\Examables\Essay\Services;
 use App\Domain\Examables\Essay\Models\Essay;
 use App\Support\Exceptions\CrudModelOperations\RegisterRecordFailException;
 use App\Support\Services\CrudModelOperationsService;
+use Domain\Exam\Actions\FilterExamBySubject;
 use Domain\Exam\Models\Exam;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Http\Request;
+use Domain\Exam\Actions\FilterExamByEffectiveDate;
 
 class EssayService extends CrudModelOperationsService
 {
@@ -69,6 +72,47 @@ class EssayService extends CrudModelOperationsService
         $dataToCreateExam = $this->filterDataToCreateExam($dataToCreateExam);
 
         Exam::create($dataToCreateExam->toArray());
+    }
+
+    /**
+     * Get filtered records by query parameters in the database
+     *
+     * 
+     * @return Collection
+     **/
+    public function getRecordsFilteredByQuery(Request $request): Collection
+    {
+
+        $user = auth()->user();
+
+        $subjectId = $request->subject_id;
+
+        $topic = $request->topic;
+
+        $observation = $request->observation;
+
+        $effectiveDate = $request->effective_date;
+
+        $query = $this->model::query()
+            ->ofUser($user)
+            ->when($subjectId, function ($query, $subjectId) {
+                return FilterExamBySubject::filter($query, $subjectId);
+            })
+            ->when($effectiveDate, function ($query, $effectiveDate) {
+                return FilterExamByEffectiveDate::filter($query, $effectiveDate);
+            })
+            ->when($topic, function ($query, $topic) {
+                $lowerTopic = strtolower($topic);
+                return $query->whereRaw('LOWER(topic) LIKE ?', ["%$lowerTopic%"]);
+            })
+            ->when($observation, function ($query, $observation) {
+                $lowerObservation = strtolower($observation);
+                return $query->whereRaw('LOWER(observation) LIKE ?', ["%$lowerObservation%"]);
+            });
+
+        $collection = $query->get();
+
+        return $collection;
     }
     private function filterDataToCreateEssay(Collection $dataToFilter): Collection
     {

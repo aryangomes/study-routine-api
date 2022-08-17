@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use Illuminate\Testing\Fluent\AssertableJson;
 
 class GroupWorkControllerTest extends TestCase
 {
@@ -204,6 +205,54 @@ class GroupWorkControllerTest extends TestCase
     }
 
     /**
+     *
+     * @dataProvider queryParametersToFilterGroupWorks
+     * 
+     * @test
+     *
+     */
+    public function get_filtered_users_groups_work_successfully($key, $value, $jsonKey)
+    {
+
+        Sanctum::actingAs($this->user);
+
+        if (in_array($key, ['subject_id', 'effective_date'])) {
+
+            Exam::factory()->groupWork()->create([
+                $key => $value,
+                'subject_id' => 1
+            ]);
+        } else {
+            $attributes = [
+                $key => $value,
+
+            ];
+            Exam::factory()->groupWork($attributes)->create([
+                'subject_id' => 1
+            ]);
+        }
+
+
+
+        $response = $this->getJson(
+            route(
+                'groupsWork.index',
+                [$key => $value]
+            )
+        );
+
+        $response->assertOk();
+
+
+        $response
+            ->assertJson(
+                fn (AssertableJson $json) =>
+                $json->where($jsonKey, $value)
+
+            );
+    }
+
+    /**
      * 
      * @test
      */
@@ -354,6 +403,24 @@ class GroupWorkControllerTest extends TestCase
 
 
 
+        ];
+    }
+
+    public function queryParametersToFilterGroupWorks()
+    {
+        return [
+            'Query Parameter: subject_id' => [
+                'subject_id', 1, '0.exam.subject.id',
+
+            ],
+            'Query Parameter: effective_date' => [
+                'effective_date', date('Y-m-d'), '0.exam.effective_date',
+
+            ],
+            'Query Parameter: topic' =>
+            ['topic', 'A Topic', '0.topic'],
+            'Query Parameter: note' =>
+            ['note', 'some note', '0.note']
         ];
     }
 
