@@ -2,8 +2,7 @@
 
 namespace App\Providers;
 
-use App\Domain\Examables\GroupWork\Member\Models\Member;
-use App\Domain\Examables\GroupWork\Models\GroupWork;
+
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -78,25 +77,55 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapEssayApiRoutes();
 
+        $this->mapTestApiRoutes();
+
+        $this->mapTopicsTestApiRoutes();
+
         $this->mapDailyActivityApiRoutes();
+
+        $this->mapExamApiRoutes();
+
+        $this->mapNotificationsApiRoutes();
+
+        $this->mapUserApiRoutes();
+
+        $this->mapSubjectApiRoutes();
     }
 
     private function mapGroupWorkApiRoutes()
     {
 
-        Route::prefix('api/v1/')
+        Route::prefix('api/v1/exams/')
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
-            ->group(base_path('routes/api/v1/group_work.php'));
+            ->group(base_path('routes/api/v1/examables/groupWork/group_work.php'));
+    }
+
+    private function mapTestApiRoutes()
+    {
+
+        Route::prefix('api/v1/exams/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/examables/test/test.php'));
+    }
+
+    private function mapTopicsTestApiRoutes()
+    {
+
+        Route::prefix('api/v1/exams/tests/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/examables/test/topics.php'));
     }
 
     private function mapMemberGroupWorkApiRoutes()
     {
 
-        Route::prefix('api/v1/groupsWork/{groupWork}')
+        Route::prefix('api/v1/exams/groupsWork/{groupWork}')
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
-            ->group(base_path('routes/api/v1/members_group_work.php'));
+            ->group(base_path('routes/api/v1/examables/groupWork/members_group_work.php'));
     }
 
     private function mapHomeworkApiRoutes()
@@ -108,13 +137,14 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/api/v1/homework.php'));
     }
 
+
     private function mapEssayApiRoutes()
     {
 
         Route::prefix('api/v1/exams')
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
-            ->group(base_path('routes/api/v1/essay.php'));
+            ->group(base_path('routes/api/v1/examables/essay.php'));
     }
 
     private function mapDailyActivityApiRoutes()
@@ -124,5 +154,37 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum', 'verified'])
             ->namespace($this->namespace)
             ->group(base_path('routes/api/v1/daily_activity.php'));
+    }
+
+    private function mapExamApiRoutes()
+    {
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/exam.php'));
+    }
+
+    private function mapNotificationsApiRoutes()
+    {
+        Route::prefix('api/v1/notifications')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/notification.php'));
+    }
+
+    private function mapUserApiRoutes()
+    {
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/user.php'));
+    }
+
+    private function mapSubjectApiRoutes()
+    {
+        Route::prefix('api/v1/')
+            ->middleware(['api', 'auth:sanctum', 'verified'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api/v1/subject.php'));
     }
 }

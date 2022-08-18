@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Domain\DailyActivity\Services;
 
 use App\Domain\DailyActivity\Models\DailyActivity;
+use App\Domain\DailyActivity\Notifications\UserDailyActivityNotification;
 use App\Support\Actions\CrudModelOperations\Create;
 use App\Support\Services\CrudModelOperationsService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Domain\User\Models\User;
+use Illuminate\Notifications\DatabaseNotification;
 
 class DailyActivityService extends CrudModelOperationsService
 {
@@ -106,6 +109,28 @@ class DailyActivityService extends CrudModelOperationsService
 
         return $modelCreated;
     }
+
+
+    public function getUnreadUserDailyActivitiesNotifications(): Collection
+    {
+        $user = User::find(auth()->user()->id);
+
+        $userDailyActivitiesNotifications =
+            $user->unreadNotifications->filter(fn ($notification) => $notification->type === UserDailyActivityNotification::class);
+
+
+        return $userDailyActivitiesNotifications;
+    }
+
+    public function markReadUserDailyActivityNotification(DatabaseNotification $userDailyActivityNotification)
+    {
+        try {
+            $userDailyActivityNotification->markAsRead();
+        } catch (\Exception $exception) {
+            throw new \Exception("It was not possible to mark the notification as read.");
+        }
+    }
+
 
     private function setActivitableTypeClassToDataToCreateDailyActivity($dataToCreateCollection): Collection
     {

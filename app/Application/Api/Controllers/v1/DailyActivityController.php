@@ -6,10 +6,12 @@ use App\Application\Api\Requests\DailyActivity\StoreDailyActivity;
 use App\Application\Api\Requests\DailyActivity\UpdateDailyActivity;
 use App\Application\Api\Resources\DailyActivity\DailyActivityCollection;
 use App\Application\Api\Resources\DailyActivity\DailyActivityResource;
+use App\Application\Api\Resources\DailyActivity\Notifications\UserDailyActivityCollection;
 use App\Domain\DailyActivity\Models\DailyActivity;
 use App\Domain\DailyActivity\Services\DailyActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Notifications\DatabaseNotification;
 
 class DailyActivityController extends BaseApiController
 {
@@ -120,5 +122,18 @@ class DailyActivityController extends BaseApiController
     {
         $activitablesType = array_keys(DailyActivity::getActivitables());
         return response()->json($activitablesType);
+    }
+
+
+    /**
+     * 
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getUnreadUserDailyActivitiesNotifications()
+    {
+        $unreadUserDailyActivitiesNotifications = $this->dailyActivityService->getUnreadUserDailyActivitiesNotifications();
+
+        return response()->json(new UserDailyActivityCollection($unreadUserDailyActivitiesNotifications));
     }
 }
