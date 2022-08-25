@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Exam\Notifications;
 
-use App\Domain\Exam\Notifications\NearbyEffectiveDate;
+use App\Domain\Exam\Notifications\NearbyEffectiveDateNotification;
 use App\Support\Traits\CreateAModelFromFactory;
 use Carbon\Carbon;
 use Domain\Exam\Models\Exam;
@@ -52,7 +52,7 @@ class NearbyEffectiveDateTest extends TestCase
         $users->each(function ($user) {
             Notification::assertSentTo(
                 [$user],
-                function (NearbyEffectiveDate $notification, $channels) use ($user) {
+                function (NearbyEffectiveDateNotification $notification, $channels) use ($user) {
                     return $notification->exam->id === $user->subjects[0]->exams[0]->id;
                 }
             );
@@ -88,13 +88,15 @@ class NearbyEffectiveDateTest extends TestCase
         $users->each(function ($user) {
             Notification::assertSentTo(
                 [$user],
-                function (NearbyEffectiveDate $notification, $channels) use ($user) {
+                function (NearbyEffectiveDateNotification $notification, $channels) use ($user) {
                     $this->assertContains('database', $channels);
 
                     $databaseNotification = $notification->toDatabase($notification);
                     $this->assertEquals([
-                        'exam_effective_date' => $user->subjects[0]->exams[0]->effective_date,
+                        'id' => $user->subjects[0]->exams[0]->id,
+                        'effective_date' => $user->subjects[0]->exams[0]->effective_date,
                         'subject_name' => $user->subjects[0]->name,
+                        'subject_id' => $user->subjects[0]->id,
                         'user_name' => $user->name,
                     ], $databaseNotification);
 

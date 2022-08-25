@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Api\v1;
 
 use App\Domain\DailyActivity\Models\DailyActivity;
+use App\Domain\DailyActivity\Notifications\UserDailyActivityNotification;
 use App\Support\Traits\UserCanAccessThisRoute;
 use Carbon\Carbon;
 use Database\Seeders\Tests\DailyActivityTestSeeder;
@@ -16,6 +17,7 @@ use App\Domain\Homework\Models\Homework;
 use Domain\Exam\Models\Exam;
 use Domain\Subject\Models\Subject;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Illuminate\Support\Facades\Artisan;
 
 class DailyActivityControllerTest extends TestCase
 {
@@ -432,6 +434,98 @@ class DailyActivityControllerTest extends TestCase
         $response->assertNotFound();
     }
 
+
+    /**
+     * @test
+     */
+    public function get_unread_user_daily_activities_notifications_successfully()
+    {
+
+        Sanctum::actingAs($this->user);
+
+        $timeToTravel = Carbon::today()->startOfHour();
+
+        $this->travelTo($timeToTravel);
+
+        Artisan::call('schedule:run');
+
+        $response = $this->getJson(
+            route('notifications.unread.dailyActivities.userDailyActivities')
+        );
+
+
+        $response->assertJson(
+            fn (AssertableJson $json)  =>
+            $json->where('0.activity.id', $this->dailyActivity->id)
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function mark_as_read_a_user_daily_activities_notification_successfully()
+    {
+        Sanctum::actingAs($this->user);
+
+        $timeToTravel = Carbon::today()->startOfHour();
+
+        $this->travelTo($timeToTravel);
+
+        Artisan::call('schedule:run');
+
+        $userDailyActivityUnreadNotification =
+            $this->user->unreadNotifications->filter(fn ($userDailyActivityUnreadNotification) => $userDailyActivityUnreadNotification->type === UserDailyActivityNotification::class)->first();
+
+        $response = $this->getJson(
+            route(
+                'notifications.unread.notification.markAsRead',
+                ['notification' => $userDailyActivityUnreadNotification->id]
+            )
+
+        );
+
+        $response->assertOk();
+
+        $response->assertJson(
+            fn (AssertableJson $json) =>
+            $json->where(
+                'response',
+                __('notifications.unread.notification.markedAsRead')
+            )
+        );
+
+        $notificationRead = $this->user->notifications->filter(fn ($userNotification) => $userNotification->id === $userDailyActivityUnreadNotification->id)->first();
+
+
+        $this->assertTrue(
+            $notificationRead->read_at != null
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function fail_to_mark_as_read_a_user_daily_activities_notification()
+    {
+        Sanctum::actingAs($this->user);
+
+        $timeToTravel = Carbon::today()->startOfHour();
+
+        $this->travelTo($timeToTravel);
+
+        Artisan::call('schedule:run');
+
+        $response = $this->getJson(
+            route(
+                'notifications.unread.notification.markAsRead',
+                ['notification' => 1]
+            )
+
+        );
+
+
+        $response->assertNotFound();
+    }
 
 
     //PROVIDERS

@@ -31,7 +31,7 @@ class DailyActivityFactory extends Factory
     public function definition()
     {
         return [
-            'date_of_activity' => Carbon::now(),
+            'date_of_activity' => Carbon::today(),
             'start_time' => Carbon::now()->toTimeString(),
             'end_time' => Carbon::now()->addHour()->toTimeString()
         ];

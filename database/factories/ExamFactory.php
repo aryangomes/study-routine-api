@@ -90,4 +90,31 @@ class ExamFactory extends Factory
             ];
         });
     }
+
+    /**
+     * Indicate this exam is a essay.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function randomExamable()
+    {
+        $examablesClasses = collect([
+            Essay::class,
+            Test::class,
+            GroupWork::class,
+        ]);
+
+        $classExamable = $examablesClasses->random();
+
+        return $this->state(function (array $attributes) use ($classExamable) {
+
+            return [
+                'examable_type' => $classExamable,
+                'examable_id' => $classExamable::factory()->create(),
+                'subject_id' => $attributes['subject_id'],
+                'effective_date' => $attributes['effective_date'],
+
+            ];
+        });
+    }
 }

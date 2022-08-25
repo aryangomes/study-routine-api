@@ -5,12 +5,7 @@ use App\Application\Api\Controllers\v1\Authentication\EmailVerification\ResendEm
 use App\Application\Api\Controllers\v1\Authentication\LoginController;
 use App\Application\Api\Controllers\v1\Authentication\LogoutController;
 use App\Application\Api\Controllers\v1\Authentication\RegisterUserController;
-use App\Application\Api\Controllers\v1\Examables\Test\AddNewTopicController;
-use App\Application\Api\Controllers\v1\Examables\Test\GetTopicsController;
-use App\Application\Api\Controllers\v1\Examables\Test\TestController;
-use App\Application\Api\Controllers\v1\SubjectController;
-use App\Application\Api\Controllers\v1\Examables\Test\Topic\TopicController;
-use App\Application\Api\Controllers\v1\UserController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,38 +47,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     /**
      * User Resource Controller Routes
      */
-    Route::controller(UserController::class)
-        ->name('users.')
-        ->group(function () {
-            Route::get('/users', 'show')->name('show');
-            Route::patch('/users', 'update')->name('update');
-            Route::delete('/users', 'destroy')->name('destroy');
-        });
+
 
     /**
      *  Subject Resource Controller Routes
      */
-    Route::apiResource('subjects', SubjectController::class);
-
-    /**
-     *  Exam Tests Resource Controller Routes
-     */
-    Route::prefix('exams')->group(function () {
-
-        Route::apiResource('tests', TestController::class);
-
-        Route::post('/tests/{test}/addNewTopic', AddNewTopicController::class)
-            ->name('tests.add_new_topic');
-
-        Route::get('/tests/{test}/topics', GetTopicsController::class)
-            ->name('tests.get_topics');
-
-
-        //Test's Topics Resource Controller Routes
-        Route::prefix('tests')->group(
-            function () {
-                Route::apiResource('topics', TopicController::class);
-            }
-        );
-    });
 });

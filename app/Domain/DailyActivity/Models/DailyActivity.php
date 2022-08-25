@@ -132,4 +132,9 @@ class DailyActivity extends Model
     {
         return !is_null($this->activitable?->exam);
     }
+
+    public static function getActivityType(string $activityType): string
+    {
+        return array_flip(self::$ACTIVITABLES)[$activityType];
+    }
 }

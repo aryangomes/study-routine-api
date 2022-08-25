@@ -2,14 +2,14 @@
 
 namespace App\Domain\Exam\Notifications;
 
-use App\Domain\Exam\Mail\NearbyEffectiveDate as MailNearbyEffectiveDate;
+use App\Domain\Exam\Mail\NearbyEffectiveDate;
 use Domain\Exam\Models\Exam;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
-class NearbyEffectiveDate extends Notification implements ShouldQueue
+class NearbyEffectiveDateNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -46,7 +46,7 @@ class NearbyEffectiveDate extends Notification implements ShouldQueue
 
         $subject =    $this->generateSubject();
 
-        return (new MailNearbyEffectiveDate($this->exam))
+        return (new NearbyEffectiveDate($this->exam))
             ->subject($subject)
             ->to($notifiable->email);
     }
@@ -61,9 +61,11 @@ class NearbyEffectiveDate extends Notification implements ShouldQueue
     {
 
         return [
+            'id' => $this->exam->id,
+            'subject_id' => $this->exam->subject->id,
             'subject_name' => $this->exam->subject->name,
             'user_name' => $this->exam->subject->user->name,
-            'exam_effective_date' => $this->exam->effective_date,
+            'effective_date' => $this->exam->effective_date,
         ];
     }
 
@@ -75,12 +77,7 @@ class NearbyEffectiveDate extends Notification implements ShouldQueue
      */
     public function toDatabase($notifiable)
     {
-
-        return [
-            'subject_name' => $this->exam->subject->name,
-            'user_name' => $this->exam->subject->user->name,
-            'exam_effective_date' => $this->exam->effective_date,
-        ];
+        return $this->toArray($notifiable);
     }
 
     private function generateSubject(): string
