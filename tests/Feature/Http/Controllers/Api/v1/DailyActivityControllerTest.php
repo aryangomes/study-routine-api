@@ -478,7 +478,7 @@ class DailyActivityControllerTest extends TestCase
 
         $response = $this->getJson(
             route(
-                'notifications.notification.markAsRead',
+                'notifications.unread.notification.markAsRead',
                 ['notification' => $userDailyActivityUnreadNotification->id]
             )
 
@@ -490,7 +490,7 @@ class DailyActivityControllerTest extends TestCase
             fn (AssertableJson $json) =>
             $json->where(
                 'response',
-                __('notifications.notification.markedAsRead')
+                __('notifications.unread.notification.markedAsRead')
             )
         );
 
@@ -517,7 +517,7 @@ class DailyActivityControllerTest extends TestCase
 
         $response = $this->getJson(
             route(
-                'notifications.notification.markAsRead',
+                'notifications.unread.notification.markAsRead',
                 ['notification' => 1]
             )
 

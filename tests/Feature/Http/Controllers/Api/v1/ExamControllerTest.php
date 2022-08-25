@@ -80,7 +80,7 @@ class ExamControllerTest extends TestCase
 
         $response = $this->getJson(
             route(
-                'notifications.notification.markAsRead',
+                'notifications.unread.notification.markAsRead',
                 ['notification' => $userNearbyEffectiveDateUnreadNotification->id]
             )
 
@@ -89,7 +89,10 @@ class ExamControllerTest extends TestCase
         $response->assertOk();
 
         $response->assertJson(
-            fn (AssertableJson $json) => $json->where('response', __('notifications.notification.markedAsRead'))
+            fn (AssertableJson $json) => $json->where(
+                'response',
+                __('notifications.unread.notification.markedAsRead')
+            )
         );
 
         $notificationRead = $this->user->notifications->filter(fn ($userNotification) => $userNotification->id === $userNearbyEffectiveDateUnreadNotification->id)->first();
