@@ -2,7 +2,13 @@
 
 namespace App\Exceptions;
 
+use App\Support\Exceptions\CustomModelNotFoundException;
+use App\Support\Exceptions\CustomNotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Log;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,6 +42,29 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+
         });
+
+        $this->renderable(function (NotFoundHttpException $exception) {
+            //
+            throw new CustomNotFoundHttpException();
+        });
+
+
+        $this->renderable(function (QueryException $exception) {
+            //
+
+            throw new CustomModelNotFoundException($exception);
+        });
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof ModelNotFoundException) {
+
+            throw new CustomModelNotFoundException($exception);
+        }
+
+        return parent::render($request, $exception);
     }
 }
